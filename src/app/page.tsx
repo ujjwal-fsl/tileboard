@@ -11,6 +11,7 @@ import { getTodayDateString, formatDate } from "@/lib/utils";
 import AddTaskModal from "@/components/AddTaskModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import DateNav from "@/components/DateNav";
 import { Plus } from "lucide-react";
 
 export default function Home() {
@@ -49,12 +50,16 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <main className="min-h-screen bg-background flex flex-col relative pb-20">
-        <header className="p-4 border-b flex justify-between items-center bg-white sticky top-0 z-10 shadow-sm">
-          <div>
+        <header className="p-4 border-b flex flex-col bg-white sticky top-0 z-10 shadow-sm gap-4">
+          <div className="flex justify-between items-center w-full">
             <h1 className="text-xl font-bold">TileBoard</h1>
-            <p className="text-xs text-muted-foreground">{formatDate(selectedDate)}</p>
+            <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
           </div>
-          <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
+          
+          <DateNav 
+            selectedDate={selectedDate} 
+            onDateChange={setSelectedDate} 
+          />
         </header>
 
         {/* Board Content */}
