@@ -31,7 +31,6 @@ export default function Home() {
     const unsubscribe = subscribeToTasks(user.uid, selectedDate, (fetchedTasks) => {
       setTasks(fetchedTasks);
       setLoading(false);
-      console.log("Fetched tasks:", fetchedTasks);
     });
 
     return () => unsubscribe();
