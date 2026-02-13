@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { createTask } from "@/lib/tasks";
 import { Button } from "@/components/ui/button";
@@ -21,13 +21,30 @@ interface AddTaskModalProps {
   selectedDate: string;
 }
 
-export default function AddTaskModal({ isOpen, onClose, selectedDate }: AddTaskModalProps) {
+export default function AddTaskModal({ isOpen, onClose, selectedDate, onOfflineSubmit }: AddTaskModalProps & { onOfflineSubmit?: () => void }) {
   const { user } = useAuth();
   const [title, setTitle] = useState("");
   const [priority, setPriority] = useState<"small" | "medium" | "big">("small");
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOffline, setIsOffline] = useState(false);
+
+  useEffect(() => {
+    // Initial check
+    setIsOffline(!navigator.onLine);
+
+    const handleOnline = () => setIsOffline(false);
+    const handleOffline = () => setIsOffline(true);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +52,8 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate }: AddTaskM
     
     setIsSubmitting(true);
     try {
-      await createTask({
+      // Fire and forget for offline to avoid blocking
+      const promise = createTask({
         userId: user.uid,
         title,
         priority,
@@ -43,6 +61,14 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate }: AddTaskM
         note,
         date: selectedDate,
       });
+
+      if (!isOffline) {
+        await promise;
+      } else {
+        // If offline, don't wait for promise resolution (it waits for connection)
+        // Just trigger the offline submit handler
+        onOfflineSubmit?.();
+      }
       
       // Reset form
       setTitle("");
@@ -52,7 +78,9 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate }: AddTaskM
       onClose();
     } catch (error) {
       console.error("Failed to create task:", error);
-      alert("Failed to create task. Please try again.");
+      if (!isOffline) {
+        alert("Failed to create task. Please try again.");
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -69,6 +97,11 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate }: AddTaskM
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Add New Task</DialogTitle>
+          {isOffline && (
+            <p className="text-sm text-yellow-600 font-medium mt-1">
+              You are offline. Task will sync when connection returns.
+            </p>
+          )}
         </DialogHeader>
         <form onSubmit={handleSubmit} className="grid gap-4 py-4">
           <div className="grid gap-2">

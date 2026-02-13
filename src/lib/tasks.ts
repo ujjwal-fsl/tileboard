@@ -61,7 +61,12 @@ export async function deleteTask(taskId: string) {
   await deleteDoc(taskRef);
 }
 
-export function subscribeToTasks(userId: string, date: string, callback: (tasks: Task[]) => void) {
+export function subscribeToTasks(
+  userId: string, 
+  date: string, 
+  callback: (tasks: Task[]) => void,
+  onError?: (error: Error) => void
+) {
   // Query requires composite index: userId ASC, date ASC, priorityLevel DESC, createdAt DESC
   const q = query(
     collection(db, TASKS_COLLECTION),
@@ -71,11 +76,17 @@ export function subscribeToTasks(userId: string, date: string, callback: (tasks:
     orderBy("createdAt", "desc")
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const tasks = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Task[];
-    callback(tasks);
-  });
+  return onSnapshot(q, 
+    (snapshot) => {
+      const tasks = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      })) as Task[];
+      callback(tasks);
+    },
+    (error) => {
+      console.error("Firestore Error:", error);
+      if (onError) onError(error);
+    }
+  );
 }

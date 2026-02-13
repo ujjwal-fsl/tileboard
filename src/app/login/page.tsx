@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Chrome } from "lucide-react";
+import GoogleIcon from "@/components/GoogleIcon";
 
 export default function LoginPage() {
   const { user, signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
@@ -64,7 +64,7 @@ export default function LoginPage() {
             className="w-full" 
             onClick={handleGoogleLogin}
           >
-            <Chrome className="mr-2 h-4 w-4" />
+            <GoogleIcon className="h-5 w-5 mr-2" />
             Continue with Google
           </Button>
 
