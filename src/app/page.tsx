@@ -13,6 +13,7 @@ import EditTaskModal from "@/components/EditTaskModal";
 import SkeletonGrid from "@/components/SkeletonGrid";
 import DateNav from "@/components/DateNav";
 import { Plus, AlertCircle } from "lucide-react";
+import { getGreeting } from "@/lib/greeting";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -21,6 +22,19 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
   
+  // Greeting state
+  const [greeting, setGreeting] = useState<{line1: string, line2: string} | null>(null);
+
+  useEffect(() => {
+    if (authLoading) return;
+    
+    if (!user) {
+      setGreeting({ line1: "Good day.", line2: "One step at a time." });
+    } else {
+      setGreeting(getGreeting(user.displayName || undefined));
+    }
+  }, [user, authLoading]);
+
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -94,7 +108,14 @@ export default function Home() {
       <main className="min-h-screen bg-background flex flex-col relative pb-20 transition-colors duration-300">
         <header className="p-4 border-b flex flex-col bg-white sticky top-0 z-10 shadow-sm gap-4">
           <div className="flex justify-between items-center w-full">
-            <h1 className="text-xl font-bold tracking-tight">TileBoard</h1>
+            {greeting ? (
+              <div className="flex flex-col">
+                <span className="font-semibold text-lg leading-tight">{greeting.line1}</span>
+                <span className="text-sm text-muted-foreground">{greeting.line2}</span>
+              </div>
+            ) : (
+              <div className="h-10" />
+            )}
             <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
           </div>
           
