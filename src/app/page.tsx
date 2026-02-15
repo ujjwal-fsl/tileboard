@@ -8,6 +8,7 @@ import TileGrid from "@/components/TileGrid";
 import { Task } from "@/types/task";
 import { subscribeToTasks, subscribeToCarryForwardCount } from "@/lib/tasks";
 import { getTodayDateString, getYesterdayDateString } from "@/lib/utils";
+import { updateDailySnapshot, getSnapshot } from "@/lib/snapshots";
 import AddTaskModal from "@/components/AddTaskModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import SkeletonGrid from "@/components/SkeletonGrid";
@@ -22,6 +23,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
   const [carryForwardCount, setCarryForwardCount] = useState(0);
+  const [yesterdaySnapshot, setYesterdaySnapshot] = useState<{
+    totalCount: number;
+    completedCount: number;
+  } | null>(null);
   
   // Greeting state
   const [greeting, setGreeting] = useState<{line1: string, line2: string} | null>(null);
@@ -51,6 +56,25 @@ export default function Home() {
     }
   }, [user, authLoading, selectedDate]);
 
+  // Gentle Reflection Subscription
+  useEffect(() => {
+    if (authLoading || !user) {
+      setYesterdaySnapshot(null);
+      return;
+    }
+
+    const isToday = selectedDate === getTodayDateString();
+    
+    if (isToday) {
+      const yesterday = getYesterdayDateString(selectedDate);
+      getSnapshot(user.uid, yesterday).then((snapshot) => {
+        setYesterdaySnapshot(snapshot);
+      });
+    } else {
+      setYesterdaySnapshot(null);
+    }
+  }, [user, authLoading, selectedDate]);
+
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -68,6 +92,11 @@ export default function Home() {
       (fetchedTasks) => {
         setTasks(fetchedTasks);
         setLoading(false);
+        
+        // Silent snapshot update
+        if (user && !authLoading) {
+          updateDailySnapshot(user.uid, selectedDate, fetchedTasks);
+        }
       },
       (err) => {
         console.error("Subscription Error:", err);
@@ -138,6 +167,14 @@ export default function Home() {
           {carryForwardCount > 0 && isToday && (
             <div className="text-sm text-muted-foreground px-1">
               {carryForwardCount} {carryForwardCount === 1 ? "task" : "tasks"} carried forward from yesterday.
+            </div>
+          )}
+
+          {yesterdaySnapshot && yesterdaySnapshot.totalCount > 0 && isToday && (
+            <div className="text-sm text-muted-foreground px-1 animate-in fade-in duration-500">
+              {yesterdaySnapshot.completedCount === yesterdaySnapshot.totalCount
+                ? "Yesterday, you completed everything you set out to do."
+                : `Yesterday, you completed ${yesterdaySnapshot.completedCount} of ${yesterdaySnapshot.totalCount} things.`}
             </div>
           )}
 
