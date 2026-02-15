@@ -1,5 +1,6 @@
 "use client";
 
+import { Check } from "lucide-react";
 import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ export default function Tile({ task, onClick }: TileProps) {
   
   // Deterministic text color: Big = white, Small/Medium = black
   const textColor = task.priority === "big" ? "text-white" : "text-black";
+  const checkColor = task.priority === "big" ? "text-white" : "text-gray-800";
 
   return (
     <div
@@ -31,6 +33,20 @@ export default function Tile({ task, onClick }: TileProps) {
         textColor
       )}
     >
+      {/* Completion Overlay */}
+      <div className={cn(
+        "absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ease-out",
+        task.status === "completed" ? "opacity-70" : "opacity-0"
+      )}>
+        <Check 
+          className={cn(
+            "w-7 h-7", // ~28px
+            checkColor
+          )} 
+          strokeWidth={3}
+        />
+      </div>
+
       <div className="flex flex-col h-full">
         {/* Category Badge */}
         {task.category && (
