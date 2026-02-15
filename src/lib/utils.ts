@@ -33,6 +33,10 @@ export function addDays(dateStr: string, days: number): string {
   return `${y}-${m}-${da}`;
 }
 
+export function getYesterdayDateString(date: string): string {
+  return addDays(date, -1);
+}
+
 export function getPriorityLevel(priority: "small" | "medium" | "big"): number {
   switch (priority) {
     case "small": return 1;

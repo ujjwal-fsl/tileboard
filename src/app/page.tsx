@@ -6,8 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import TileGrid from "@/components/TileGrid";
 import { Task } from "@/types/task";
-import { subscribeToTasks } from "@/lib/tasks";
-import { getTodayDateString } from "@/lib/utils";
+import { subscribeToTasks, subscribeToCarryForwardCount } from "@/lib/tasks";
+import { getTodayDateString, getYesterdayDateString } from "@/lib/utils";
 import AddTaskModal from "@/components/AddTaskModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import SkeletonGrid from "@/components/SkeletonGrid";
@@ -21,6 +21,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
+  const [carryForwardCount, setCarryForwardCount] = useState(0);
   
   // Greeting state
   const [greeting, setGreeting] = useState<{line1: string, line2: string} | null>(null);
@@ -34,6 +35,21 @@ export default function Home() {
       setGreeting(getGreeting(user.displayName || undefined));
     }
   }, [user, authLoading]);
+
+  // Carry Forward Subscription
+  useEffect(() => {
+    if (authLoading || !user) return;
+
+    if (selectedDate === getTodayDateString()) {
+      const yesterday = getYesterdayDateString(selectedDate);
+      const unsubscribe = subscribeToCarryForwardCount(user.uid, yesterday, (count) => {
+        setCarryForwardCount(count);
+      });
+      return () => unsubscribe();
+    } else {
+      setCarryForwardCount(0);
+    }
+  }, [user, authLoading, selectedDate]);
 
   // Modal states
   const [isAddOpen, setIsAddOpen] = useState(false);
@@ -119,6 +135,12 @@ export default function Home() {
             <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
           </div>
           
+          {carryForwardCount > 0 && isToday && (
+            <div className="text-sm text-muted-foreground px-1">
+              {carryForwardCount} {carryForwardCount === 1 ? "task" : "tasks"} carried forward from yesterday.
+            </div>
+          )}
+
           <DateNav 
             selectedDate={selectedDate} 
             onDateChange={setSelectedDate} 

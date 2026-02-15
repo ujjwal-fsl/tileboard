@@ -90,3 +90,20 @@ export function subscribeToTasks(
     }
   );
 }
+
+export function subscribeToCarryForwardCount(
+  userId: string,
+  yesterdayDate: string,
+  callback: (count: number) => void
+) {
+  const q = query(
+    collection(db, TASKS_COLLECTION),
+    where("userId", "==", userId),
+    where("date", "==", yesterdayDate),
+    where("status", "==", "active")
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    callback(snapshot.size);
+  });
+}
