@@ -3,6 +3,7 @@
 import { Check } from "lucide-react";
 import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
+import { completeTask, updateTask } from "@/lib/tasks";
 
 interface TileProps {
   task: Task;
@@ -17,7 +18,6 @@ export default function Tile({ task, onClick }: TileProps) {
   
   // Deterministic text color: Big = white, Small/Medium = black
   const textColor = task.priority === "big" ? "text-white" : "text-black";
-  const checkColor = task.priority === "big" ? "text-white" : "text-gray-800";
 
   return (
     <div
@@ -34,18 +34,31 @@ export default function Tile({ task, onClick }: TileProps) {
       )}
     >
       {/* Completion Overlay */}
-      <div className={cn(
-        "absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300 ease-out",
-        task.status === "completed" ? "opacity-70" : "opacity-0"
-      )}>
-        <Check 
-          className={cn(
-            "w-7 h-7", // ~28px
-            checkColor
-          )} 
-          strokeWidth={3}
-        />
-      </div>
+      {task.status === "completed" ? (
+        // Completed State: Centered Overlay
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-70">
+          <Check 
+            className={cn(
+              "w-7 h-7", // ~28px
+              // If tile background is dark (Big), use white/80. Else black/60.
+              task.priority === "big" ? "text-white/80" : "text-black/60"
+            )} 
+            strokeWidth={3}
+          />
+        </div>
+      ) : (
+        // Active State: Bottom Button
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            completeTask(task.id);
+          }}
+          className="absolute bottom-3 right-3 w-7 h-7 rounded-full bg-white/70 hover:bg-white/90 flex items-center justify-center transition hover:scale-105 active:scale-95 shadow-sm backdrop-blur-sm z-10"
+        >
+          <Check size={16} className="opacity-70" />
+        </button>
+      )}
 
       <div className="flex flex-col h-full">
         {/* Category Badge */}

@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { getTodayDateString, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface AddTaskModalProps {
   isOpen: boolean;
@@ -86,11 +86,7 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate, onOfflineS
     }
   };
 
-  const priorities: { value: "small" | "medium" | "big"; label: string; height: string }[] = [
-    { value: "small", label: "Small (1x)", height: "h-12" },
-    { value: "medium", label: "Medium (2x)", height: "h-20" },
-    { value: "big", label: "Big (3x)", height: "h-28" },
-  ];
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -118,21 +114,20 @@ export default function AddTaskModal({ isOpen, onClose, selectedDate, onOfflineS
 
           <div className="grid gap-2">
             <Label>Priority</Label>
-            <div className="grid grid-cols-3 gap-2">
-              {priorities.map((p) => (
+            <div className="flex gap-2 mt-2">
+              {(["small", "medium", "big"] as const).map((p) => (
                 <button
-                  key={p.value}
+                  key={p}
                   type="button"
-                  onClick={() => setPriority(p.value)}
+                  onClick={() => setPriority(p)}
                   className={cn(
-                    "border rounded-md flex items-center justify-center text-sm font-medium transition-all hover:bg-accent",
-                    p.height,
-                    priority === p.value 
-                      ? "ring-2 ring-primary border-primary bg-accent" 
-                      : "border-input text-muted-foreground"
+                    "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    priority === p
+                      ? "bg-black text-white"
+                      : "bg-muted text-muted-foreground hover:bg-muted/70"
                   )}
                 >
-                  {p.label}
+                  {p.charAt(0).toUpperCase() + p.slice(1)}
                 </button>
               ))}
             </div>

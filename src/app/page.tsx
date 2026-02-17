@@ -94,7 +94,7 @@ export default function Home() {
         setLoading(false);
         
         // Silent snapshot update
-        if (user && !authLoading) {
+        if (user && user.uid && !authLoading) {
           updateDailySnapshot(user.uid, selectedDate, fetchedTasks);
         }
       },
