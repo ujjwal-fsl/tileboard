@@ -1,6 +1,7 @@
 "use client";
 
 import { Check } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
 import { completeTask, updateTask } from "@/lib/tasks";
@@ -11,6 +12,13 @@ interface TileProps {
 }
 
 export default function Tile({ task, onClick }: TileProps) {
+  const [isCompleting, setIsCompleting] = useState(false);
+  
+  // Safety refs
+  const prevStatusRef = useRef(task.status);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isFirstRenderRef = useRef(true);
+
   const priorityLevel = getPriorityLevel(task.priority);
   
   // Row span based on priority: 1, 2, or 3
@@ -18,6 +26,40 @@ export default function Tile({ task, onClick }: TileProps) {
   
   // Deterministic text color: Big = white, Small/Medium = black
   const textColor = task.priority === "big" ? "text-white" : "text-black";
+
+  useEffect(() => {
+    // Skip animation on first render
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      prevStatusRef.current = task.status;
+      return;
+    }
+
+    const prevStatus = prevStatusRef.current;
+    const newStatus = task.status;
+
+    // Trigger animation ONLY for active -> completed
+    if (prevStatus === "active" && newStatus === "completed") {
+      setIsCompleting(true);
+      
+      // Clear existing timer safely
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      
+      timeoutRef.current = setTimeout(() => {
+        setIsCompleting(false);
+      }, 300);
+    }
+
+    prevStatusRef.current = newStatus;
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, [task.status]);
 
   return (
     <div
@@ -27,21 +69,23 @@ export default function Tile({ task, onClick }: TileProps) {
         gridRow: rowSpan,
       }}
       className={cn(
-        "relative p-4 cursor-pointer transition-colors duration-200 hover:brightness-90",
+        "relative p-4 cursor-pointer transition-all duration-300 ease-out hover:brightness-90",
         // Completed state styling
-        task.status === "completed" && "grayscale opacity-60",
+        task.status === "completed" && "grayscale opacity-80",
+        isCompleting && "scale-[0.97]",
         textColor
       )}
     >
       {/* Completion Overlay */}
       {task.status === "completed" ? (
         // Completed State: Centered Overlay
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-70">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <Check 
             className={cn(
-              "w-7 h-7", // ~28px
+              "w-7 h-7 transition-all duration-300 ease-out",
               // If tile background is dark (Big), use white/80. Else black/60.
-              task.priority === "big" ? "text-white/80" : "text-black/60"
+              task.priority === "big" ? "text-white/80" : "text-black/60",
+              isCompleting ? "opacity-0 scale-75" : "opacity-70 scale-100"
             )} 
             strokeWidth={3}
           />
@@ -54,7 +98,11 @@ export default function Tile({ task, onClick }: TileProps) {
             e.stopPropagation();
             completeTask(task.id);
           }}
-          className="absolute bottom-3 right-3 w-7 h-7 rounded-full bg-white/70 hover:bg-white/90 flex items-center justify-center transition hover:scale-105 active:scale-95 shadow-sm backdrop-blur-sm z-10"
+          className={cn(
+            "absolute bottom-3 right-3 w-7 h-7 rounded-full bg-white/70 hover:bg-white/90 flex items-center justify-center shadow-sm backdrop-blur-sm z-10",
+            "transition-all duration-200 ease-out hover:scale-105 active:scale-95",
+            "opacity-100 scale-100"
+          )}
         >
           <Check size={16} className="opacity-70" />
         </button>
