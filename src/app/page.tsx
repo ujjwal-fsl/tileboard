@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import TileGrid from "@/components/TileGrid";
 import { Task } from "@/types/task";
-import { subscribeToTasks, subscribeToCarryForwardCount } from "@/lib/tasks";
+import { subscribeToTasks, subscribeToCarryForwardTasks } from "@/lib/tasks";
 import { getTodayDateString, getYesterdayDateString } from "@/lib/utils";
 import { updateDailySnapshot, getSnapshot } from "@/lib/snapshots";
 import AddTaskModal from "@/components/AddTaskModal";
@@ -19,10 +19,10 @@ import { getGreeting } from "@/lib/greeting";
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [carryForwardTasks, setCarryForwardTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState(getTodayDateString());
-  const [carryForwardCount, setCarryForwardCount] = useState(0);
   const [yesterdaySnapshot, setYesterdaySnapshot] = useState<{
     totalCount: number;
     completedCount: number;
@@ -46,13 +46,12 @@ export default function Home() {
     if (authLoading || !user) return;
 
     if (selectedDate === getTodayDateString()) {
-      const yesterday = getYesterdayDateString(selectedDate);
-      const unsubscribe = subscribeToCarryForwardCount(user.uid, yesterday, (count) => {
-        setCarryForwardCount(count);
+      const unsubscribe = subscribeToCarryForwardTasks(user.uid, selectedDate, (carriedTasks) => {
+        setCarryForwardTasks(carriedTasks);
       });
       return () => unsubscribe();
     } else {
-      setCarryForwardCount(0);
+      setCarryForwardTasks([]);
     }
   }, [user, authLoading, selectedDate]);
 
@@ -148,6 +147,12 @@ export default function Home() {
 
   const isToday = selectedDate === getTodayDateString();
 
+  // Merge carry-forward tasks with today's tasks
+  // Filter out any carry-forward tasks that technically have today's date (safety check, though query handles date < today)
+  const mergedTasks = isToday 
+    ? [...carryForwardTasks.filter(t => t.date !== selectedDate), ...tasks]
+    : tasks;
+
   return (
     <ProtectedRoute>
       <main className="min-h-screen bg-background flex flex-col relative pb-20 transition-colors duration-300">
@@ -164,12 +169,6 @@ export default function Home() {
             <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
           </div>
           
-          {carryForwardCount > 0 && isToday && (
-            <div className="text-sm text-muted-foreground px-1">
-              {carryForwardCount} {carryForwardCount === 1 ? "task" : "tasks"} carried forward from yesterday.
-            </div>
-          )}
-
           {yesterdaySnapshot && yesterdaySnapshot.totalCount > 0 && isToday && (
             <div className="text-sm text-muted-foreground px-1 animate-in fade-in duration-500">
               {yesterdaySnapshot.completedCount === yesterdaySnapshot.totalCount
@@ -202,7 +201,7 @@ export default function Home() {
         {/* Board Content */}
         {loading ? (
           <SkeletonGrid />
-        ) : tasks.length === 0 ? (
+        ) : mergedTasks.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-grow p-8 text-center min-h-[50vh] animate-in fade-in duration-500">
             <p className="text-lg text-muted-foreground mb-4">
               {isToday ? "No tasks for today." : "No tasks for this day."}
@@ -211,7 +210,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="animate-in fade-in duration-300">
-            <TileGrid tasks={tasks} onTaskClick={handleTaskClick} />
+            <TileGrid tasks={mergedTasks} onTaskClick={handleTaskClick} />
           </div>
         )}
 

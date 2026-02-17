@@ -76,6 +76,11 @@ export default function Tile({ task, onClick }: TileProps) {
         textColor
       )}
     >
+      {/* Carry-Forward Indicator: Calm Yellow Bar */}
+      {task.isCarriedForward && (
+        <div className="absolute left-0 top-3 bottom-3 w-[3px] bg-yellow-400 rounded-full opacity-80" />
+      )}
+
       {/* Completion Overlay */}
       {task.status === "completed" ? (
         // Completed State: Centered Overlay

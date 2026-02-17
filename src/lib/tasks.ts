@@ -91,19 +91,28 @@ export function subscribeToTasks(
   );
 }
 
-export function subscribeToCarryForwardCount(
+export function subscribeToCarryForwardTasks(
   userId: string,
-  yesterdayDate: string,
-  callback: (count: number) => void
+  todayDate: string,
+  callback: (tasks: Task[]) => void
 ) {
+  // Query: userId == current, status == active, date < today
+  // Requires index: userId ASC, status ASC, date ASC
   const q = query(
     collection(db, TASKS_COLLECTION),
     where("userId", "==", userId),
-    where("date", "==", yesterdayDate),
-    where("status", "==", "active")
+    where("status", "==", "active"),
+    where("date", "<", todayDate),
+    orderBy("date", "asc")
   );
 
   return onSnapshot(q, (snapshot) => {
-    callback(snapshot.size);
+    const tasks = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+      isCarriedForward: true,
+    })) as Task[];
+    
+    callback(tasks);
   });
 }

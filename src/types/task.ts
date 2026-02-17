@@ -13,4 +13,5 @@ export interface Task {
   color: string;           // hex code, assigned at creation
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  isCarriedForward?: boolean;
 }
