@@ -82,7 +82,7 @@ export default function Tile({ task, onClick }: TileProps) {
         // If carried forward: Amber tint. Else: White.
         task.isCarriedForward 
           ? "bg-amber-50 border border-amber-200" 
-          : "bg-[#FFFFFF] border border-black/[0.04]",
+          : "bg-[#FEFEFD] border border-black/[0.04]",
         
         // Hover (Desktop only)
         "md:hover:-translate-y-[1px] md:hover:border-black/[0.12]",

@@ -167,7 +167,7 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <main className="min-h-screen bg-background flex flex-col relative pb-20 transition-colors duration-300">
+      <main className="flex flex-col min-h-screen bg-transparent">
         <header 
           className={cn(
             "p-4 flex flex-col sticky top-0 z-10 gap-4 transition-all duration-300 ease-in-out",
@@ -228,7 +228,7 @@ export default function Home() {
             <Button onClick={() => setIsAddOpen(true)}>+ Add Task</Button>
           </div>
         ) : (
-          <div className="animate-in fade-in duration-300">
+          <div className="flex-1 min-h-0 bg-transparent animate-in fade-in duration-300">
             <TileGrid tasks={mergedTasks} onTaskClick={handleTaskClick} />
           </div>
         )}
