@@ -33,7 +33,26 @@ export default function Tile({ task, onClick }: TileProps) {
   // So we ignore dynamic background color.
   
   // Text color logic upgrade
-  const textColor = task.status === "completed" ? "text-gray-500" : "text-gray-900";
+  // Priority Color Logic (Revised: CF > Completed > Priority > Default)
+  const getPriorityStyles = () => {
+    // 1. Carry-Forward (Top Priority)
+    if (task.isCarriedForward) {
+      return "bg-amber-50 border-amber-200 text-gray-900";
+    }
+    
+    // 2. Completed (If not carry-forward)
+    if (task.status === "completed") {
+      return "bg-[#F3F4F6] border-black/[0.04] text-gray-500";
+    }
+
+    // 3. Active Priority
+    switch (task.priority) {
+      case "big": return "bg-[#FEF2F2] border-black/[0.06] text-gray-900";
+      case "medium": return "bg-[#FEF7ED] border-black/[0.05] text-gray-900";
+      case "small": return "bg-[#F8FAF9] border-black/[0.04] text-gray-900";
+      default: return "bg-[#FEFEFD] border-black/[0.04] text-gray-900";
+    }
+  };
 
   useEffect(() => {
     // Skip animation on first render
@@ -76,21 +95,18 @@ export default function Tile({ task, onClick }: TileProps) {
         gridRow: rowSpan,
       }}
       className={cn(
-        "relative p-3 rounded-xl cursor-pointer transition-all duration-200 ease",
+        "relative p-3 rounded-xl cursor-pointer transition-colors duration-200 ease-out",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
-        // Visual Style
-        // If carried forward: Amber tint. Else: White.
-        task.isCarriedForward 
-          ? "bg-amber-50 border border-amber-200" 
-          : "bg-[#FEFEFD] border border-black/[0.04]",
+        
+        // Apply Priority Styles
+        getPriorityStyles(),
         
         // Hover (Desktop only)
         "md:hover:-translate-y-[1px] md:hover:border-black/[0.12]",
         
-        // Completed state styling
-        task.status === "completed" && "opacity-75 scale-[0.985]",
-        isCompleting && "scale-[0.985]",
-        textColor
+        // Animation scales (Opacity handled by getPriorityStyles for completed, but we add scale)
+        task.status === "completed" && "scale-[0.985]",
+        isCompleting && "scale-[0.985]"
       )}
     >
       {/* Remove old carry-forward bar */}
