@@ -15,6 +15,7 @@ import SkeletonGrid from "@/components/SkeletonGrid";
 import DateNav from "@/components/DateNav";
 import { Plus, AlertCircle } from "lucide-react";
 import { getGreeting } from "@/lib/greeting";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
@@ -145,6 +146,17 @@ export default function Home() {
     setSelectedTask(null);
   };
 
+  // Scroll state for header interaction
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const isToday = selectedDate === getTodayDateString();
 
   // Merge carry-forward tasks with today's tasks
@@ -156,12 +168,19 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <main className="min-h-screen bg-background flex flex-col relative pb-20 transition-colors duration-300">
-        <header className="p-4 border-b flex flex-col bg-white sticky top-0 z-10 shadow-sm gap-4">
+        <header 
+          className={cn(
+            "p-4 flex flex-col sticky top-0 z-10 gap-4 transition-all duration-300 ease-in-out",
+            isScrolled 
+              ? "bg-[rgba(250,250,248,0.75)] backdrop-blur-[6px] border-b border-black/[0.04] py-3" 
+              : "bg-transparent border-transparent pt-6 pb-2"
+          )}
+        >
           <div className="flex justify-between items-center w-full">
             {greeting ? (
               <div className="flex flex-col">
-                <span className="font-semibold text-lg leading-tight">{greeting.line1}</span>
-                <span className="text-sm text-muted-foreground">{greeting.line2}</span>
+                <span className="text-[18px] font-[450] tracking-tight text-foreground leading-tight">{greeting.line1}</span>
+                <span className="text-[13px] text-muted-foreground font-normal">{greeting.line2}</span>
               </div>
             ) : (
               <div className="h-10" />
@@ -216,12 +235,12 @@ export default function Home() {
 
         {/* Floating Add Button */}
         {!loading && (
-          <Button
-            className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg z-20 transition-transform active:scale-95"
+          <button
+            className="fixed bottom-6 right-6 w-14 h-14 rounded-[14px] bg-[#111827] text-white flex items-center justify-center z-20 transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="h-6 w-6" />
-          </Button>
+          </button>
         )}
 
         {/* Modals */}

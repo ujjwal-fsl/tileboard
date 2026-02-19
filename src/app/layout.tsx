@@ -17,7 +17,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} min-h-screen bg-[#FAFAF8] antialiased`}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
