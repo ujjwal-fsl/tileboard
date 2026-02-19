@@ -42,13 +42,13 @@ export default function Tile({ task, onClick }: TileProps) {
     
     // 2. Completed (If not carry-forward)
     if (task.status === "completed") {
-      return "bg-[#F3F4F6] border-black/[0.04] text-gray-500";
+      return "bg-[#F1F3F5] border-black/[0.03] text-gray-400";
     }
 
     // 3. Active Priority
     switch (task.priority) {
-      case "big": return "bg-[#FEF2F2] border-black/[0.06] text-gray-900";
-      case "medium": return "bg-[#FEF7ED] border-black/[0.05] text-gray-900";
+      case "big": return "bg-[#FDE8E8] border-black/[0.08] text-gray-900";
+      case "medium": return "bg-[#FEF3E2] border-black/[0.06] text-gray-900";
       case "small": return "bg-[#F8FAF9] border-black/[0.04] text-gray-900";
       default: return "bg-[#FEFEFD] border-black/[0.04] text-gray-900";
     }
@@ -95,7 +95,7 @@ export default function Tile({ task, onClick }: TileProps) {
         gridRow: rowSpan,
       }}
       className={cn(
-        "relative p-3 rounded-xl cursor-pointer transition-colors duration-200 ease-out",
+        "relative p-3 rounded-[4px] cursor-pointer transition-all duration-200 ease-out",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
         
         // Apply Priority Styles
@@ -104,8 +104,8 @@ export default function Tile({ task, onClick }: TileProps) {
         // Hover (Desktop only)
         "md:hover:-translate-y-[1px] md:hover:border-black/[0.12]",
         
-        // Animation scales (Opacity handled by getPriorityStyles for completed, but we add scale)
-        task.status === "completed" && "scale-[0.985]",
+        // Animation scales and opacity (Completed state: receded)
+        task.status === "completed" && "opacity-[0.55] scale-[0.985]",
         isCompleting && "scale-[0.985]"
       )}
     >
