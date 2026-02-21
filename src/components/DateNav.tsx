@@ -26,7 +26,7 @@ export default function DateNav({ selectedDate, onDateChange }: DateNavProps) {
   };
 
   return (
-    <div className="flex items-center justify-between bg-card text-card-foreground p-1 rounded-lg border shadow-sm w-full max-w-md mx-auto my-4">
+    <div className="flex items-center justify-between w-full max-w-md mx-auto my-4">
       <Button 
         variant="ghost" 
         size="icon" 

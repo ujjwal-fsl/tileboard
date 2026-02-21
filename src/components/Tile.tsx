@@ -24,15 +24,6 @@ export default function Tile({ task, onClick }: TileProps) {
   // Row span based on priority: 1, 2, or 3
   const rowSpan = `span ${priorityLevel}`;
   
-  // Deterministic text color: Big = white (if colored), Small/Medium = black
-  // NOTE: Premium UI enforces simple text colors. Active = gray-900, Completed = gray-500.
-  // We override colored backgrounds for now to ensure premium uniformity unless specified otherwise.
-  // But wait, user said "Tile must use explicit neutral surface".
-  // So we ignore task.color for background, use it only if needed for accent?
-  // User instruction: "Tile container must use background-color: #FFFFFF". 
-  // So we ignore dynamic background color.
-  
-  // Text color logic upgrade
   const textColor = task.status === "completed" ? "text-gray-500" : "text-gray-900";
 
   useEffect(() => {
@@ -76,16 +67,22 @@ export default function Tile({ task, onClick }: TileProps) {
         gridRow: rowSpan,
       }}
       className={cn(
-        "relative p-3 rounded-xl cursor-pointer transition-all duration-200 ease",
+        "relative p-3 rounded-[6px] cursor-pointer transition-all duration-200 ease-out",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
-        // Visual Style
-        // If carried forward: Amber tint. Else: White.
-        task.isCarriedForward 
-          ? "bg-amber-50 border border-amber-200" 
-          : "bg-[#FEFEFD] border border-black/[0.04]",
+
+        // Priority tint resolution: CF > completed > big > medium > small
+        task.isCarriedForward
+          ? "bg-amber-50 border border-amber-200"
+          : task.status === "completed"
+            ? "bg-[#F1F3F5] border border-black/[0.03]"
+            : priorityLevel === 3
+              ? "bg-[#FDE8E8] border border-black/[0.07]"
+              : priorityLevel === 2
+                ? "bg-[#FEF3E2] border border-black/[0.05]"
+                : "bg-[#F8FAF9] border border-black/[0.04]",
         
         // Hover (Desktop only)
-        "md:hover:-translate-y-[1px] md:hover:border-black/[0.12]",
+        "md:hover:-translate-y-[1px] md:hover:border-black/[0.10] md:hover:shadow-[0_0.5px_1px_rgba(0,0,0,0.02)]",
         
         // Completed state styling
         task.status === "completed" && "opacity-75 scale-[0.985]",
@@ -93,11 +90,9 @@ export default function Tile({ task, onClick }: TileProps) {
         textColor
       )}
     >
-      {/* Remove old carry-forward bar */}
-      
+
       {/* Completion Overlay */}
-      {task.status === "completed" ? (
-        // Completed State: Centered Overlay
+      {task.status === "completed" && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <Check 
             className={cn(
@@ -107,37 +102,9 @@ export default function Tile({ task, onClick }: TileProps) {
             strokeWidth={2.5}
           />
         </div>
-      ) : (
-        // Active State: Bottom Button (Optional/Hidden for premium feel? No, kept but clean)
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            completeTask(task.id);
-          }}
-          className={cn(
-            "absolute bottom-3 right-3 w-7 h-7 rounded-full bg-transparent hover:bg-black/5 flex items-center justify-center z-10",
-            "transition-all duration-200 ease-out hover:scale-105 active:scale-95",
-            "opacity-0 md:opacity-0 group-hover:opacity-100 md:group-hover:opacity-50" // Only show on hover? 
-            // User didn't specify button removal, but premium usually means less clutter.
-            // Let's stick to previous active logic but refined style if needed.
-            // Actually user instructions didn't explicitly change the button style itself other than "Checkmark: opacity-70 No bounce".
-            // Let's keep it minimal.
-          )}
-        >
-          {/* We'll use a cleaner simple circle or just hidden until hover if we were bold, 
-              but let's Stick to the existing button but make it very subtle */}
-           <div className="w-5 h-5 rounded-full border border-black/10 hover:border-black/30 flex items-center justify-center">
-             {/* Empty circle for "check" action */}
-           </div>
-        </button>
       )}
 
-      {/* Wait, the user instructions "Phase 3..5" didn't mention changing the Active Button html structure much.
-         But "Phase 4 - Checkmark: opacity-70 no bounce".
-         Let's stick to the previous button logic but strip the "bg-white/70" etc to match the new flat design?
-         Actually, let's keep the button accessible for mobile tap.
-      */}
+      {/* Complete Button */}
        {task.status !== "completed" && (
         <button
           type="button"
@@ -146,8 +113,8 @@ export default function Tile({ task, onClick }: TileProps) {
             completeTask(task.id);
           }}
           className={cn(
-             "absolute bottom-3 right-3 w-6 h-6 rounded-full border border-black/10 flex items-center justify-center z-10",
-             "bg-white/50 hover:bg-white hover:border-black/20 transition-all duration-200"
+             "absolute bottom-3 right-3 w-6 h-6 rounded-full border border-black/[0.08] flex items-center justify-center z-10",
+             "bg-transparent hover:border-black/[0.15] transition-all duration-200"
           )}
         >
           {/* Minimal circle */}
@@ -158,7 +125,7 @@ export default function Tile({ task, onClick }: TileProps) {
       <div className="flex flex-col h-full relative z-0">
         {/* Category Badge - muted */}
         {task.category && (
-          <div className="absolute top-0 right-0 text-[10px] font-medium uppercase tracking-wider opacity-40">
+          <div className="absolute top-0 right-0 text-[10px] font-medium uppercase tracking-wider opacity-30">
             {task.category}
           </div>
         )}
