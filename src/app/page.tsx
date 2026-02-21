@@ -21,6 +21,7 @@ import AddTaskModal from "@/components/AddTaskModal";
 import EditTaskModal from "@/components/EditTaskModal";
 import SkeletonGrid from "@/components/SkeletonGrid";
 import DateNav from "@/components/DateNav";
+import GreetingOverlay from "@/components/GreetingOverlay";
 import { Plus, AlertCircle } from "lucide-react";
 import { getGreeting } from "@/lib/greeting";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,13 @@ export default function Home() {
   
   // Greeting state
   const [greeting, setGreeting] = useState<{line1: string, line2: string} | null>(null);
+  const [showGreetingOverlay, setShowGreetingOverlay] = useState(false);
+
+  useEffect(() => {
+    if (greeting) {
+      setShowGreetingOverlay(true);
+    }
+  }, [greeting]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -175,6 +183,12 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
+      {showGreetingOverlay && greeting && (
+        <GreetingOverlay
+          greeting={greeting}
+          onFinish={() => setShowGreetingOverlay(false)}
+        />
+      )}
       <main className="flex flex-col min-h-screen bg-transparent">
         <header
           className={cn(
