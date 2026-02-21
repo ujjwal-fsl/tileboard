@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Calendar } from "lucide-react";
-import { formatDate, addDays, getTodayDateString, cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { formatDate, addDays, getTodayDateString } from "@/lib/utils";
 
 interface DateNavProps {
   selectedDate: string;
@@ -26,40 +25,40 @@ export default function DateNav({ selectedDate, onDateChange }: DateNavProps) {
   };
 
   return (
-    <div className="flex items-center justify-between w-full max-w-md mx-auto my-4">
-      <Button 
-        variant="ghost" 
-        size="icon" 
-        onClick={handlePrev}
-        title="Previous Day"
-      >
-        <ChevronLeft className="h-5 w-5" />
-      </Button>
+    <div className="flex items-center justify-center gap-6 py-2">
 
-      <div className="flex flex-col items-center">
-        <h2 className="text-sm font-semibold sm:text-base">
+      <button
+        onClick={handlePrev}
+        className="p-1 rounded-md hover:bg-black/[0.04] transition-colors duration-150"
+        aria-label="Previous Day"
+      >
+        <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+      </button>
+
+      <div className="flex flex-col items-center min-w-[180px]">
+        <h2 className="text-[15px] font-[450] tracking-tight text-foreground">
           {formatDate(selectedDate)}
         </h2>
+
         {!isToday && (
-          <button 
+          <button
             onClick={handleToday}
-            className="text-xs text-primary hover:underline flex items-center gap-1 mt-0.5"
+            className="text-[12px] text-muted-foreground hover:text-foreground transition-colors duration-150"
           >
             Back to Today
           </button>
         )}
       </div>
 
-      <div className="flex items-center gap-1">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={handleNext}
-          title="Next Day"
-        >
-          <ChevronRight className="h-5 w-5" />
-        </Button>
-      </div>
+      <button
+        onClick={handleNext}
+        className="p-1 rounded-md hover:bg-black/[0.04] transition-colors duration-150"
+        aria-label="Next Day"
+      >
+        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+      </button>
+
     </div>
   );
 }
+
