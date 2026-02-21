@@ -90,35 +90,37 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] rounded-[12px] border border-black/[0.06] shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-[#FEFEFD] px-5 pt-5 pb-4">
         <DialogHeader>
           <DialogTitle>Edit Task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="grid gap-4 py-4">
-          <div className="grid gap-2">
-            <Label htmlFor="edit-title">Title</Label>
+          <div className="mt-3 gap-1">
+            <Label htmlFor="edit-title" className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Title</Label>
             <Input
               id="edit-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={60}
               required
+              autoFocus
+              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label>Priority</Label>
-            <div className="flex gap-2 mt-2">
+          <div className="mt-3 gap-1">
+            <Label className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Priority</Label>
+            <div className="flex gap-2 mt-1">
               {(["small", "medium", "big"] as const).map((p) => (
                 <button
                   key={p}
                   type="button"
                   onClick={() => setPriority(p)}
                   className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-md transition-colors",
+                    "px-4 py-2 text-sm font-medium rounded-[6px] transition-all duration-150 ease-out",
                     priority === p
-                      ? "bg-black text-white"
-                      : "bg-muted text-muted-foreground hover:bg-muted/70"
+                      ? "bg-[#111827] text-white border border-transparent"
+                      : "bg-transparent text-gray-500 border border-black/[0.06] hover:border-black/[0.12] hover:text-gray-900"
                   )}
                 >
                   {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -127,25 +129,26 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
             </div>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="edit-category">Category</Label>
+          <div className="mt-3 gap-1">
+            <Label htmlFor="edit-category" className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Category</Label>
             <Input
               id="edit-category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               maxLength={30}
               placeholder="None"
+              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
             />
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="edit-note">Note</Label>
+          <div className="mt-3 gap-1">
+            <Label htmlFor="edit-note" className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Note</Label>
             <Textarea
               id="edit-note"
               value={note}
               onChange={(e) => setNote(e.target.value)}
               maxLength={500}
-              className="resize-none h-24"
+              className="resize-none h-24 text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
             />
           </div>
 
@@ -153,17 +156,18 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
              <div className="flex gap-2">
               <Button 
                 type="button" 
-                variant="destructive" 
+                variant="ghost" 
                 size="icon"
                 onClick={handleDelete}
                 title="Delete Task"
+                className="text-red-500 hover:text-red-600"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
               {task.status !== "completed" && (
                 <Button 
                   type="button" 
-                  variant="secondary" 
+                  variant="ghost" 
                   size="icon"
                   onClick={handleComplete}
                   title="Mark Complete"
@@ -173,10 +177,10 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
               )}
              </div>
              <div className="flex gap-2">
-              <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
+              <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-gray-500 hover:text-gray-900 rounded-[6px] px-4 py-2 font-medium">
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting} className="bg-[#111827] text-white hover:opacity-90 active:scale-[0.98] rounded-[6px] px-4 py-2 font-medium">
                 Save Changes
               </Button>
              </div>
