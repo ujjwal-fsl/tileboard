@@ -90,9 +90,9 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-[12px] border border-black/[0.06] shadow-[0_8px_24px_rgba(0,0,0,0.08)] bg-[#FEFEFD] px-5 pt-5 pb-4">
+      <DialogContent className="sm:max-w-[425px] rounded-[6px] border border-black/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.04)] bg-background px-5 pt-5 pb-4">
         <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
+          <DialogTitle className="font-[500] tracking-tight text-[18px] text-foreground">Edit Task</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSave} className="grid gap-4 py-4">
           <div className="mt-3 gap-1">
@@ -104,7 +104,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
               maxLength={60}
               required
               autoFocus
-              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
+              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 transition-all duration-150 ease-out"
             />
           </div>
 
@@ -117,10 +117,10 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
                   type="button"
                   onClick={() => setPriority(p)}
                   className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-[6px] transition-all duration-150 ease-out",
+                    "px-4 py-2 text-sm font-medium rounded-[6px] transition-all duration-150 ease-out active:scale-[0.97]",
                     priority === p
-                      ? "bg-[#111827] text-white border border-transparent"
-                      : "bg-transparent text-gray-500 border border-black/[0.06] hover:border-black/[0.12] hover:text-gray-900"
+                      ? "bg-foreground text-background border border-transparent"
+                      : "bg-muted/50 text-muted-foreground border border-black/[0.06] hover:bg-muted hover:text-gray-900"
                   )}
                 >
                   {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -137,7 +137,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
               onChange={(e) => setCategory(e.target.value)}
               maxLength={30}
               placeholder="None"
-              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
+              className="text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 transition-all duration-150 ease-out"
             />
           </div>
 
@@ -148,7 +148,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
               value={note}
               onChange={(e) => setNote(e.target.value)}
               maxLength={500}
-              className="resize-none h-24 text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-0"
+              className="resize-none h-24 text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 transition-all duration-150 ease-out"
             />
           </div>
 
@@ -160,7 +160,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
                 size="icon"
                 onClick={handleDelete}
                 title="Delete Task"
-                className="text-red-500 hover:text-red-600"
+                className="text-destructive hover:bg-destructive/10 transition-colors duration-150 ease-out"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
