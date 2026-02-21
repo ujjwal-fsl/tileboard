@@ -176,23 +176,26 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <main className="flex flex-col min-h-screen bg-transparent">
-        <header 
+        <header
           className={cn(
-            "p-4 flex flex-col sticky top-0 z-10 gap-4 transition-all duration-300 ease-in-out",
-            isScrolled 
-              ? "bg-[rgba(250,250,248,0.75)] backdrop-blur-[6px] border-b border-black/[0.04] py-3" 
-              : "bg-transparent border-transparent pt-6 pb-2"
+            "sticky top-0 z-10 flex items-center justify-between px-4",
+            "h-[52px] md:h-[60px]",
+            "transition-all duration-300 ease-in-out",
+            isScrolled
+              ? "bg-[rgba(250,250,248,0.75)] backdrop-blur-[6px] border-b border-black/[0.04]"
+              : "bg-transparent border-transparent"
           )}
         >
-          <div className="flex justify-between items-center w-full">
-            {greeting ? (
-              <div className="flex flex-col">
-                <span className="text-[18px] font-[450] tracking-tight text-foreground leading-tight">{greeting.line1}</span>
-                <span className="text-[13px] text-muted-foreground font-normal">{greeting.line2}</span>
-              </div>
-            ) : (
-              <div className="h-10" />
-            )}
+          <div className="w-8" />
+
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <DateNav
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
+            />
+          </div>
+
+          <div className="flex items-center">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button
@@ -225,19 +228,6 @@ export default function Home() {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          
-          {yesterdaySnapshot && yesterdaySnapshot.totalCount > 0 && isToday && (
-            <div className="text-sm text-muted-foreground px-1 animate-in fade-in duration-500">
-              {yesterdaySnapshot.completedCount === yesterdaySnapshot.totalCount
-                ? "Yesterday, you completed everything you set out to do."
-                : `Yesterday, you completed ${yesterdaySnapshot.completedCount} of ${yesterdaySnapshot.totalCount} things.`}
-            </div>
-          )}
-
-          <DateNav 
-            selectedDate={selectedDate} 
-            onDateChange={setSelectedDate} 
-          />
         </header>
 
         {/* Error State */}
