@@ -4,6 +4,14 @@ import { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
+} from "@/components/ui/dropdown-menu";
 import TileGrid from "@/components/TileGrid";
 import { Task } from "@/types/task";
 import { subscribeToTasks, subscribeToCarryForwardTasks } from "@/lib/tasks";
@@ -185,7 +193,37 @@ export default function Home() {
             ) : (
               <div className="h-10" />
             )}
-            <Button variant="ghost" size="sm" onClick={() => signOut()}>Sign Out</Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className="w-7 h-7 rounded-full bg-muted flex items-center justify-center text-sm font-medium transition-all duration-150 hover:bg-muted/80"
+                >
+                  {user?.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt="User avatar"
+                      className="w-full h-full rounded-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-[12px]">
+                      {user?.displayName?.charAt(0) || "U"}
+                    </span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                  {user?.email}
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem onClick={() => signOut()}>
+                  Sign Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {yesterdaySnapshot && yesterdaySnapshot.totalCount > 0 && isToday && (
@@ -236,7 +274,7 @@ export default function Home() {
         {/* Floating Add Button */}
         {!loading && (
           <button
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-[14px] bg-[#111827] text-white flex items-center justify-center z-20 transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
+            className="fixed bottom-6 right-6 w-14 h-14 rounded-[8px] bg-[#111827] text-white flex items-center justify-center z-20 transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="h-6 w-6" />
