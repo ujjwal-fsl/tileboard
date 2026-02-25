@@ -227,7 +227,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
             ) : (
               <div 
                 onClick={() => setIsEditingNote(true)}
-                className="h-24 px-3 py-2 text-[16px] font-[450] tracking-tight text-gray-900 cursor-text whitespace-pre-wrap overflow-y-auto"
+                className="h-24 px-3 py-2 text-[16px] font-[450] tracking-tight text-gray-900 cursor-text whitespace-pre-wrap overflow-y-auto pointer-events-auto"
               >
                 <LinkifiedText text={note} />
               </div>

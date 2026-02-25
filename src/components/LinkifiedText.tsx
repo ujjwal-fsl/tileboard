@@ -21,7 +21,7 @@ export default function LinkifiedText({ text }: LinkifiedTextProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
-              className="text-neutral-600 no-underline hover:text-neutral-900 hover:underline transition-colors duration-150 ease-out"
+              className="text-primary underline underline-offset-2 hover:opacity-80"
             >
               {part}
             </a>
