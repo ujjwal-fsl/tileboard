@@ -4,7 +4,8 @@ import { Check } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
-import { completeTask, updateTask } from "@/lib/tasks";
+import { completeTask } from "@/lib/tasks";
+import { setSpatialOrigin } from "@/lib/spatialContinuity";
 
 interface TileProps {
   task: Task;
@@ -19,6 +20,7 @@ export default function Tile({ task, onClick, index }: TileProps) {
   const prevStatusRef = useRef(task.status);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const isFirstRenderRef = useRef(true);
+  const tileRef = useRef<HTMLDivElement>(null);
 
   const priorityLevel = getPriorityLevel(task.priority);
   
@@ -63,7 +65,13 @@ export default function Tile({ task, onClick, index }: TileProps) {
 
   return (
     <div
-      onClick={() => onClick(task)}
+      ref={tileRef}
+      onClick={() => {
+        if (tileRef.current) {
+          setSpatialOrigin(tileRef.current.getBoundingClientRect());
+        }
+        onClick(task);
+      }}
       style={{ 
         gridRow: rowSpan,
         transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',

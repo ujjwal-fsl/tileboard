@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { Task } from "@/types/task";
 import { updateTask, completeTask, deleteTask } from "@/lib/tasks";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Trash2, Check } from "lucide-react";
 import LinkifiedText from "./LinkifiedText";
+import { getSpatialOrigin, clearSpatialOrigin } from "@/lib/spatialContinuity";
 
 interface EditTaskModalProps {
   task: Task | null;
@@ -31,6 +32,47 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isEditingNote, setIsEditingNote] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (!isOpen) return;
+    const origin = getSpatialOrigin();
+    const modal = modalRef.current;
+
+    if (!origin || !modal) return;
+
+    const modalRect = modal.getBoundingClientRect();
+
+    const dx = origin.rect.left - modalRect.left;
+    const dy = origin.rect.top - modalRect.top;
+    const scale = origin.rect.width / modalRect.width;
+
+    modal.style.transformOrigin = "top left";
+    modal.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+    modal.style.opacity = "0";
+
+    requestAnimationFrame(() => {
+      modal.style.transition =
+        "transform 180ms cubic-bezier(0.2,0,0,1), opacity 180ms cubic-bezier(0.2,0,0,1)";
+      modal.style.transform = "translate(0,0) scale(1)";
+      modal.style.opacity = "1";
+    });
+
+    clearSpatialOrigin();
+  }, [isOpen]);
+
+  const handleClose = () => {
+    const modal = modalRef.current;
+    if (modal) {
+      modal.style.transition =
+        "transform 140ms cubic-bezier(0.2,0,0,1), opacity 140ms cubic-bezier(0.2,0,0,1)";
+      modal.style.transform = "scale(0.98)";
+      modal.style.opacity = "0";
+      setTimeout(() => onClose(), 140);
+    } else {
+      onClose();
+    }
+  };
 
   useEffect(() => {
     if (task) {
@@ -54,7 +96,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
         category,
         note,
       });
-      onClose();
+      handleClose();
     } catch (error) {
       console.error("Failed to update task:", error);
       alert("Failed to update task.");
@@ -68,7 +110,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
     if (confirm("Mark this task as completed?")) {
       try {
         await completeTask(task.id);
-        onClose();
+        handleClose();
       } catch (error) {
         console.error("Failed to complete task:", error);
       }
@@ -80,7 +122,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
     if (confirm("Are you sure you want to delete this task? This cannot be undone.")) {
       try {
         await deleteTask(task.id);
-        onClose();
+        handleClose();
       } catch (error) {
         console.error("Failed to delete task:", error);
       }
@@ -92,8 +134,8 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
   if (!task) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] rounded-[6px] border border-black/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.04)] bg-background px-5 pt-5 pb-4">
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
+      <DialogContent ref={modalRef} className="sm:max-w-[425px] rounded-[6px] border border-black/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.04)] bg-background px-5 pt-5 pb-4">
         <DialogHeader>
           <DialogTitle className="font-[500] tracking-tight text-[18px] text-foreground">Edit Task</DialogTitle>
         </DialogHeader>
@@ -191,7 +233,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
               )}
              </div>
              <div className="flex gap-2">
-              <Button type="button" variant="ghost" onClick={onClose} disabled={isSubmitting} className="text-gray-500 hover:text-gray-900 rounded-[6px] px-4 py-2 font-medium">
+              <Button type="button" variant="ghost" onClick={handleClose} disabled={isSubmitting} className="text-gray-500 hover:text-gray-900 rounded-[6px] px-4 py-2 font-medium">
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting} className="bg-[#111827] text-white hover:opacity-90 active:scale-[0.98] rounded-[6px] px-4 py-2 font-medium">
