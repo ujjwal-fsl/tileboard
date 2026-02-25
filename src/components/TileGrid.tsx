@@ -14,9 +14,9 @@ export default function TileGrid({ tasks, onTaskClick }: TileGridProps) {
   }
 
   return (
-    <div className="tile-grid w-full bg-transparent gap-[6px] px-4 pb-24 pt-1">
-      {tasks.map((task) => (
-        <Tile key={task.id} task={task} onClick={onTaskClick} />
+    <div className="tile-grid w-full bg-transparent gap-[5px] px-3 pb-24 pt-1">
+      {tasks.map((task, index) => (
+        <Tile key={task.id} task={task} onClick={onTaskClick} index={index} />
       ))}
     </div>
   );

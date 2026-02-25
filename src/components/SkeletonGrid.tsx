@@ -7,12 +7,12 @@ export default function SkeletonGrid() {
   const skeletons = [3, 2, 1, 2, 1, 3, 1, 2, 1, 1, 2]; 
 
   return (
-    <div className="tile-grid w-full min-h-screen bg-black gap-[3px] p-[3px]">
+    <div className="tile-grid w-full min-h-screen bg-transparent gap-[5px] px-3 pb-24 pt-1">
       {skeletons.map((span, i) => (
         <div
           key={i}
-          className="bg-muted/20 animate-pulse w-full h-full"
-          style={{ gridRow: `span ${span}` }}
+          className="bg-black/[0.03] rounded-[8px] w-full h-full skeleton-shimmer"
+          style={{ gridRow: `span ${span}`, animationDelay: `${i * 50}ms` }}
         />
       ))}
     </div>

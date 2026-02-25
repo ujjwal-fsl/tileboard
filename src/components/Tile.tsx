@@ -9,9 +9,10 @@ import { completeTask, updateTask } from "@/lib/tasks";
 interface TileProps {
   task: Task;
   onClick: (task: Task) => void;
+  index: number;
 }
 
-export default function Tile({ task, onClick }: TileProps) {
+export default function Tile({ task, onClick, index }: TileProps) {
   const [isCompleting, setIsCompleting] = useState(false);
   
   // Safety refs
@@ -65,27 +66,31 @@ export default function Tile({ task, onClick }: TileProps) {
       onClick={() => onClick(task)}
       style={{ 
         gridRow: rowSpan,
+        transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+        animation: `tile-enter 250ms cubic-bezier(0.2, 0, 0, 1) ${Math.min(index * 30, 300)}ms both`
       }}
       className={cn(
-        "relative p-3 rounded-[6px] cursor-pointer transition-all duration-200 ease-out",
+        "relative rounded-[8px] cursor-pointer transition-[transform,box-shadow,border-color,opacity] duration-150",
+        priorityLevel >= 3 ? "p-3.5" : "p-3",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
 
         // Priority tint resolution: CF > completed > big > medium > small
         task.isCarriedForward
-          ? "bg-amber-50 border border-amber-200"
+          ? "bg-[#FFFBEB] border border-amber-600/[0.12]"
           : task.status === "completed"
-            ? "bg-[#F1F3F5] border border-black/[0.03]"
+            ? "bg-[#F3F4F6] border border-black/[0.03]"
             : priorityLevel === 3
-              ? "bg-[#FDE8E8] border border-black/[0.07]"
+              ? "bg-[#FDE8E8] border border-black/[0.04]"
               : priorityLevel === 2
-                ? "bg-[#FEF3E2] border border-black/[0.05]"
+                ? "bg-[#FEF3E2] border border-black/[0.04]"
                 : "bg-[#F8FAF9] border border-black/[0.04]",
         
-        // Hover (Desktop only)
-        "md:hover:-translate-y-[1px] md:hover:border-black/[0.10] md:hover:shadow-[0_0.5px_1px_rgba(0,0,0,0.02)]",
+        // Hover & Press (Desktop only, guarded against completed tasks)
+        task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
+        task.status !== "completed" && "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]",
         
         // Completed state styling
-        task.status === "completed" && "opacity-75 scale-[0.985]",
+        task.status === "completed" && "opacity-70 scale-[0.98]",
         isCompleting && "scale-[0.985]",
         textColor
       )}
@@ -95,8 +100,9 @@ export default function Tile({ task, onClick }: TileProps) {
       {task.status === "completed" && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <Check 
+            style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)' }}
             className={cn(
-              "w-7 h-7 transition-all duration-300 ease-out text-gray-400/70",
+              "w-7 h-7 transition-[opacity,transform] duration-250 text-gray-400/70",
               isCompleting ? "opacity-0 scale-75" : "opacity-70 scale-100"
             )} 
             strokeWidth={2.5}
@@ -113,8 +119,10 @@ export default function Tile({ task, onClick }: TileProps) {
             completeTask(task.id);
           }}
           className={cn(
-             "absolute bottom-3 right-3 w-6 h-6 rounded-full border border-black/[0.08] flex items-center justify-center z-10",
-             "bg-transparent hover:border-black/[0.15] transition-all duration-200"
+             "absolute bottom-3 right-3 w-5 h-5 rounded-full border border-black/[0.08] flex items-center justify-center z-10",
+             "bg-transparent transition-[border-color,background-color,transform] duration-150",
+             "md:hover:border-black/[0.14] md:hover:bg-black/[0.02]",
+             "md:active:scale-[0.9]"
           )}
         >
           {/* Minimal circle */}
@@ -125,23 +133,23 @@ export default function Tile({ task, onClick }: TileProps) {
       <div className="flex flex-col h-full relative z-0">
         {/* Category Badge - muted */}
         {task.category && (
-          <div className="absolute top-0 right-0 text-[10px] font-medium uppercase tracking-wider opacity-30">
+          <div className="absolute top-0 right-0 text-[10px] font-medium uppercase tracking-[0.06em] opacity-25">
             {task.category}
           </div>
         )}
 
         {/* Title */}
         <h3 className={cn(
-          "font-[450] text-[15px] leading-snug tracking-tight line-clamp-3 mt-0.5",
-          task.status === "completed" && "line-through decoration-black/10"
+          "font-[460] text-[14.5px] leading-[1.35] tracking-[-0.01em] line-clamp-3 mt-0.5",
+          task.status === "completed" && "line-through decoration-gray-300/40 font-[420]"
         )}>
           {task.title}
         </h3>
         
         {/* Note Indicator */}
         {task.note && (
-          <div className="mt-auto pt-2 opacity-30">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="mt-auto pt-2 opacity-20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>

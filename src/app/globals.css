@@ -143,3 +143,26 @@
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* Linear-grade tile entry animation */
+@keyframes tile-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Skeleton shimmer — calm, Linear-grade loading rhythm */
+@keyframes skeleton-shimmer {
+  0%   { opacity: 0.04; }
+  50%  { opacity: 0.08; }
+  100% { opacity: 0.04; }
+}
+
+.skeleton-shimmer {
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+}
