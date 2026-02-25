@@ -14,5 +14,9 @@ export function getSpatialOrigin() {
 }
 
 export function clearSpatialOrigin() {
+  if (origin && origin.element) {
+    origin.element.style.transition = "none";
+    origin.element.style.opacity = "1";
+  }
   origin = null;
 }
