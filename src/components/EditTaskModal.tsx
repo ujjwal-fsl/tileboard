@@ -51,25 +51,70 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
     modal.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
     modal.style.opacity = "0";
 
+    const backdrop = document.querySelector('[data-slot="dialog-overlay"]') as HTMLElement;
+    if (backdrop) {
+      backdrop.style.opacity = "0";
+      backdrop.style.transition = "none";
+    }
+
+    if (origin.element) {
+      origin.element.style.opacity = "0.92";
+      origin.element.style.transition = "opacity 120ms ease-out";
+    }
+
     requestAnimationFrame(() => {
       modal.style.transition =
         "transform 180ms cubic-bezier(0.2,0,0,1), opacity 180ms cubic-bezier(0.2,0,0,1)";
       modal.style.transform = "translate(0,0) scale(1)";
       modal.style.opacity = "1";
+
+      if (backdrop) {
+        backdrop.style.transition = "opacity 180ms cubic-bezier(0.2, 0, 0, 1)";
+        backdrop.style.opacity = "1";
+      }
     });
 
-    clearSpatialOrigin();
   }, [isOpen]);
 
   const handleClose = () => {
     const modal = modalRef.current;
-    if (modal) {
+    const origin = getSpatialOrigin();
+
+    if (modal && origin) {
+      const modalRect = modal.getBoundingClientRect();
+      const dx = origin.rect.left - modalRect.left;
+      const dy = origin.rect.top - modalRect.top;
+      const scale = origin.rect.width / modalRect.width;
+
+      modal.style.transition = "transform 160ms cubic-bezier(0.4, 0, 1, 1), opacity 160ms cubic-bezier(0.4, 0, 1, 1)";
+      modal.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+      modal.style.opacity = "0";
+
+      const backdrop = document.querySelector('[data-slot="dialog-overlay"]') as HTMLElement;
+      if (backdrop) {
+        backdrop.style.transition = "opacity 160ms cubic-bezier(0.4, 0, 1, 1)";
+        backdrop.style.opacity = "0";
+      }
+
+      if (origin.element) {
+        origin.element.style.opacity = "1";
+      }
+
+      setTimeout(() => {
+        clearSpatialOrigin();
+        onClose();
+      }, 160);
+    } else if (modal) {
       modal.style.transition =
         "transform 140ms cubic-bezier(0.2,0,0,1), opacity 140ms cubic-bezier(0.2,0,0,1)";
       modal.style.transform = "scale(0.98)";
       modal.style.opacity = "0";
-      setTimeout(() => onClose(), 140);
+      setTimeout(() => {
+        clearSpatialOrigin();
+        onClose();
+      }, 140);
     } else {
+      clearSpatialOrigin();
       onClose();
     }
   };

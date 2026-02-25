@@ -66,9 +66,9 @@ export default function Tile({ task, onClick, index }: TileProps) {
   return (
     <div
       ref={tileRef}
-      onClick={() => {
+      onClick={(e) => {
         if (tileRef.current) {
-          setSpatialOrigin(tileRef.current.getBoundingClientRect());
+          setSpatialOrigin(tileRef.current.getBoundingClientRect(), tileRef.current);
         }
         onClick(task);
       }}
