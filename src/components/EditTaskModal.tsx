@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Trash2, Check } from "lucide-react";
+import LinkifiedText from "./LinkifiedText";
 
 interface EditTaskModalProps {
   task: Task | null;
@@ -29,6 +30,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isEditingNote, setIsEditingNote] = useState(false);
 
   useEffect(() => {
     if (task) {
@@ -36,6 +38,7 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
       setPriority(task.priority);
       setCategory(task.category || "");
       setNote(task.note || "");
+      setIsEditingNote(false);
     }
   }, [task]);
 
@@ -143,13 +146,24 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
 
           <div className="mt-3 gap-1">
             <Label htmlFor="edit-note" className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Note</Label>
-            <Textarea
-              id="edit-note"
-              value={note}
-              onChange={(e) => setNote(e.target.value)}
-              maxLength={500}
-              className="resize-none h-24 text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 transition-all duration-150 ease-out"
-            />
+            {isEditingNote ? (
+              <Textarea
+                id="edit-note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                onBlur={() => setIsEditingNote(false)}
+                maxLength={500}
+                autoFocus
+                className="resize-none h-24 text-[16px] font-[450] tracking-tight text-gray-900 placeholder:text-gray-400 border-transparent focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 transition-all duration-150 ease-out"
+              />
+            ) : (
+              <div 
+                onClick={() => setIsEditingNote(true)}
+                className="h-24 px-3 py-2 text-[16px] font-[450] tracking-tight text-gray-900 cursor-text whitespace-pre-wrap overflow-y-auto"
+              >
+                <LinkifiedText text={note} />
+              </div>
+            )}
           </div>
 
           <DialogFooter className="flex justify-between items-center sm:justify-between w-full mt-4">
