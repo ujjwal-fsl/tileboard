@@ -182,21 +182,24 @@ export default function EditTaskModal({ task, isOpen, onClose }: EditTaskModalPr
           <div className="mt-3 gap-1">
             <Label className="text-[11px] uppercase tracking-wide text-gray-400 font-medium">Priority</Label>
             <div className="flex gap-2 mt-1">
-              {(["small", "medium", "big"] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPriority(p)}
-                  className={cn(
-                    "px-4 py-2 text-sm font-medium rounded-[6px] transition-all duration-150 ease-out active:scale-[0.97]",
-                    priority === p
-                      ? "bg-foreground text-background border border-transparent"
-                      : "bg-muted/50 text-muted-foreground border border-black/[0.06] hover:bg-muted hover:text-gray-900"
-                  )}
-                >
-                  {p.charAt(0).toUpperCase() + p.slice(1)}
-                </button>
-              ))}
+              {(["small", "medium", "big"] as const).map((p) => {
+                const labelMap = { small: "Low", medium: "Medium", big: "High" };
+                return (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPriority(p)}
+                    className={cn(
+                      "px-4 py-2 text-sm font-medium rounded-[6px] transition-all duration-150 ease-out active:scale-[0.97]",
+                      priority === p
+                        ? "bg-foreground text-background border border-transparent"
+                        : "bg-muted/50 text-muted-foreground border border-black/[0.06] hover:bg-muted hover:text-gray-900"
+                    )}
+                  >
+                    {labelMap[p]}
+                  </button>
+                );
+              })}
             </div>
           </div>
 

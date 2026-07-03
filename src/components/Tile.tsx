@@ -86,12 +86,12 @@ export default function Tile({ task, onClick, index }: TileProps) {
         task.isCarriedForward
           ? "bg-[#FFFBEB] border border-amber-600/[0.12]"
           : task.status === "completed"
-            ? "bg-[#F3F4F6] border border-black/[0.03]"
+            ? "bg-[#F0F0EE] border border-black/[0.03]"
             : priorityLevel === 3
-              ? "bg-[#FDE8E8] border border-black/[0.04]"
+              ? "bg-[#F2E6E2] border border-black/[0.04]"
               : priorityLevel === 2
-                ? "bg-[#FEF3E2] border border-black/[0.04]"
-                : "bg-[#F8FAF9] border border-black/[0.04]",
+                ? "bg-[#F2ECE2] border border-black/[0.04]"
+                : "bg-[#F6F5F2] border border-black/[0.04]",
         
         // Hover & Press (Desktop only, guarded against completed tasks)
         task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
