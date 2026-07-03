@@ -86,12 +86,12 @@ export default function Tile({ task, onClick, index }: TileProps) {
         task.isCarriedForward
           ? "bg-[#FFFBEB] border border-amber-600/[0.12]"
           : task.status === "completed"
-            ? "bg-[#F0F0EE] border border-black/[0.03]"
+            ? "bg-[#E2E4E9] border border-black/[0.03]"
             : priorityLevel === 3
-              ? "bg-[#F2E6E2] border border-black/[0.04]"
+              ? "bg-[#E7CCAC] border border-black/[0.04]"
               : priorityLevel === 2
-                ? "bg-[#F2ECE2] border border-black/[0.04]"
-                : "bg-[#F6F5F2] border border-black/[0.04]",
+                ? "bg-[#F1E3CD] border border-black/[0.04]"
+                : "bg-[#FAF8F5] border border-black/[0.04]",
         
         // Hover & Press (Desktop only, guarded against completed tasks)
         task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
@@ -110,8 +110,8 @@ export default function Tile({ task, onClick, index }: TileProps) {
           <Check 
             style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)' }}
             className={cn(
-              "w-7 h-7 transition-[opacity,transform] duration-250 text-gray-400/70",
-              isCompleting ? "opacity-0 scale-75" : "opacity-70 scale-100"
+              "w-7 h-7 transition-[opacity,transform] duration-250 text-gray-500",
+              isCompleting ? "opacity-0 scale-75" : "opacity-100 scale-100"
             )} 
             strokeWidth={2.5}
           />
