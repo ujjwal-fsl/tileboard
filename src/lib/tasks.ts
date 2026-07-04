@@ -13,19 +13,17 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { Task } from "@/types/task";
-import { getRandomColor } from "@/lib/colors";
 import { getPriorityLevel } from "@/lib/utils";
 
 const TASKS_COLLECTION = "tasks";
 
 export async function createTask(data: Omit<Task, "id" | "createdAt" | "updatedAt" | "color" | "priorityLevel" | "status">) {
   const priorityLevel = getPriorityLevel(data.priority);
-  const color = getRandomColor(data.priority);
   
   await addDoc(collection(db, TASKS_COLLECTION), {
     ...data,
     priorityLevel,
-    color,
+    color: "",
     status: "active",
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -38,10 +36,9 @@ export async function updateTask(taskId: string, data: Partial<Omit<Task, "id" |
     updatedAt: serverTimestamp(),
   };
 
-  // If priority changes, update priorityLevel and re-assign color
+  // If priority changes, update priorityLevel
   if (data.priority) {
     updates.priorityLevel = getPriorityLevel(data.priority);
-    updates.color = getRandomColor(data.priority);
   }
 
   const taskRef = doc(db, TASKS_COLLECTION, taskId);
