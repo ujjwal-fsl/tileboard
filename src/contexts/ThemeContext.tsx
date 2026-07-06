@@ -3,15 +3,13 @@
 "use client";
 
 import React, { createContext, useEffect, useMemo, useState } from "react";
+import { themes } from "@/lib/themes";
+import type { VisualStyleDefinition } from "@/lib/themes";
 
 /**
  * Appearance settings – how the UI should determine light/dark mode.
  */
 export type AppearanceSetting = "light" | "dark";
-/**
- * Visual style options – the two approved style families.
- */
-export type VisualStyleOption = "pastel" | "pop";
 
 export interface ThemeContextProps {
   /** Current appearance setting */
@@ -20,10 +18,10 @@ export interface ThemeContextProps {
   setAppearanceSetting: (setting: AppearanceSetting) => void;
   /** Resolved concrete mode: "light" or "dark" */
   resolvedMode: "light" | "dark";
-  /** Current visual style */
-  visualStyle: VisualStyleOption;
-  /** Change visual style */
-  setVisualStyle: (style: VisualStyleOption) => void;
+  /** Current visual style definition */
+  activeVisualStyle: VisualStyleDefinition;
+  /** Change visual style by ID */
+  setActiveVisualStyleId: (styleId: "pastel" | "pop") => void;
 }
 
 const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
@@ -76,24 +74,28 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, [resolvedMode]);
 
   // ---------- Visual Style ----------
-  const getInitialVisualStyle = (): VisualStyleOption => {
+  const getInitialVisualStyleId = (): "pastel" | "pop" => {
     if (typeof window === "undefined") return "pastel"; // default during SSR
     const stored = window.localStorage.getItem("tileboard.visualStyle");
     if (stored === "pastel" || stored === "pop") {
-      return stored as VisualStyleOption;
+      return stored as "pastel" | "pop";
     }
     return "pastel"; // default
   };
 
-  const [visualStyle, setVisualStyleState] = useState<VisualStyleOption>(
-    getInitialVisualStyle()
+  const [visualStyleId, setVisualStyleIdState] = useState<"pastel" | "pop">(
+    getInitialVisualStyleId()
   );
 
-  const setVisualStyle = (style: VisualStyleOption) => {
+  const activeVisualStyle = useMemo(() => {
+    return themes[visualStyleId];
+  }, [visualStyleId]);
+
+  const setActiveVisualStyleId = (styleId: "pastel" | "pop") => {
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("tileboard.visualStyle", style);
+      window.localStorage.setItem("tileboard.visualStyle", styleId);
     }
-    setVisualStyleState(style);
+    setVisualStyleIdState(styleId);
   };
 
   // Memoize the context value to avoid unnecessary rerenders of consumers.
@@ -102,10 +104,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       appearanceSetting,
       setAppearanceSetting,
       resolvedMode,
-      visualStyle,
-      setVisualStyle,
+      activeVisualStyle,
+      setActiveVisualStyleId,
     }),
-    [appearanceSetting, resolvedMode, visualStyle]
+    [appearanceSetting, resolvedMode, activeVisualStyle]
   );
 
   return (

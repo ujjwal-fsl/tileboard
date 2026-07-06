@@ -5,7 +5,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/contexts/ThemeContext";
-import type { AppearanceSetting, VisualStyleOption } from "@/contexts/ThemeContext";
+import type { AppearanceSetting } from "@/contexts/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -32,7 +32,7 @@ import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
-  const { appearanceSetting, setAppearanceSetting, resolvedMode, visualStyle, setVisualStyle } = useTheme();
+  const { appearanceSetting, setAppearanceSetting, resolvedMode, activeVisualStyle, setActiveVisualStyleId } = useTheme();
 
   useEffect(() => {
     console.log("ThemeContext state changed:", { appearanceSetting, resolvedMode });
@@ -255,7 +255,7 @@ export default function Home() {
                   <DropdownMenuSeparator />
 
                   <DropdownMenuLabel className="mt-2 text-xs text-muted-foreground">Visual Style</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup value={visualStyle} onValueChange={(value) => setVisualStyle(value as VisualStyleOption)}>
+                   <DropdownMenuRadioGroup value={activeVisualStyle.id} onValueChange={(value) => setActiveVisualStyleId(value as "pastel" | "pop")}>
                     <DropdownMenuRadioItem value="pastel">Pastel</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="pop">Pop</DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>

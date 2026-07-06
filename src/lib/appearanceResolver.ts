@@ -20,6 +20,9 @@ export interface TaskAppearance {
   category: string;
   checkmark: string;
   completedClass: string; // Dynamic presentation style classes
+  padding: string;        // Layout padding (p-3.5 vs p-3)
+  hoverClass: string;     // Desktop hover styles
+  interactiveClass: string; // Active scaling/press styles
 }
 
 /**
@@ -47,6 +50,18 @@ export function resolveTaskAppearance(
   // Backward compatibility: if visualStyle is passed as a string, look it up in themes
   const styleDef = typeof visualStyle === "string" ? themes[visualStyle] : visualStyle;
 
+  // 1. Padding decision based entirely on priority
+  const padding = identity.priority === "big" ? "p-3.5" : "p-3";
+
+  // 2. Hover and active classes determined by completion status
+  const hoverClass = !identity.isCompleted
+    ? "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]"
+    : "";
+  const interactiveClass = !identity.isCompleted
+    ? "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]"
+    : "";
+
+  // 3. Handle carried forward logic
   if (identity.isCarriedForward) {
     return {
       background: "bg-[#FFFBEB]",
@@ -55,6 +70,9 @@ export function resolveTaskAppearance(
       category: "absolute top-0 right-0 text-[10px] font-medium uppercase tracking-[0.06em] text-gray-900/40",
       checkmark: "text-gray-500",
       completedClass: "",
+      padding,
+      hoverClass,
+      interactiveClass,
     };
   }
 
@@ -64,12 +82,14 @@ export function resolveTaskAppearance(
   let background = "";
   let completedClass = "";
 
+  // 4. Completed state styling decisions
   if (identity.isCompleted) {
+    completedClass = "opacity-70 scale-[0.98]"; // Tile base completion styles
     if (styleDef.type === "hierarchical" && paletteColors.completed) {
       background = paletteColors.completed;
     } else {
       background = paletteColors[tierKey];
-      completedClass = "opacity-40 grayscale-[40%]";
+      completedClass += " opacity-40 grayscale-[40%]";
     }
   } else {
     background = paletteColors[tierKey];
@@ -84,17 +104,17 @@ export function resolveTaskAppearance(
       : paletteColors.category,
     checkmark: paletteColors.checkmark,
     completedClass,
+    padding,
+    hoverClass,
+    interactiveClass,
   };
 }
 
-// Backward compatibility: mapTokensToTailwindClasses
-// We keep it as a stub so existing callers don't crash if any are left during the transition,
-// but in Tile.tsx we'll refactor it to use the new TaskAppearance properties directly.
+// Backward compatibility stub (not needed in Tile.tsx but kept for safety)
 export function mapTokensToTailwindClasses(
   tokens: any,
   mode: "light" | "dark"
 ) {
-  // If tokens is already a TaskAppearance object, return it in the format of the old mapping
   if (tokens && typeof tokens === "object" && "background" in tokens) {
     return {
       bgClass: tokens.background,

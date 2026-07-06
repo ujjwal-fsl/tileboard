@@ -25,11 +25,11 @@ export default function Tile({ task, onClick, index }: TileProps) {
   const isFirstRenderRef = useRef(true);
   const tileRef = useRef<HTMLDivElement>(null);
   const priorityLevel = getPriorityLevel(task.priority);
-  const { visualStyle, resolvedMode } = useTheme();
+  const { activeVisualStyle, resolvedMode } = useTheme();
   const rowSpan = `span ${priorityLevel}`;
   // Resolve visual identity and styles from styling library
   const identity = resolveTaskIdentity(task);
-  const appearance = resolveTaskAppearance(identity, visualStyle as "pastel" | "pop", resolvedMode);
+  const appearance = resolveTaskAppearance(identity, activeVisualStyle, resolvedMode);
 
   useEffect(() => {
     // Skip animation on first render
@@ -81,19 +81,14 @@ export default function Tile({ task, onClick, index }: TileProps) {
       }}
       className={cn(
         "relative rounded-[8px] cursor-pointer transition-[transform,box-shadow,border-color,opacity] duration-150",
-        priorityLevel >= 3 ? "p-3.5" : "p-3",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
         appearance.background,
         appearance.border,
         appearance.text,
+        appearance.padding,
+        appearance.hoverClass,
+        appearance.interactiveClass,
         appearance.completedClass,
-        
-        // Hover & Press (Desktop only, guarded against completed tasks)
-        task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
-        task.status !== "completed" && "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]",
-        
-        // Completed state styling
-        task.status === "completed" && "opacity-70 scale-[0.98]",
         isCompleting && "scale-[0.985]"
       )}
     >
