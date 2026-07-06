@@ -29,9 +29,7 @@ export default function Tile({ task, onClick, index }: TileProps) {
   const rowSpan = `span ${priorityLevel}`;
   // Resolve visual identity and styles from styling library
   const identity = resolveTaskIdentity(task);
-  const tokens = resolveTaskAppearance(identity, visualStyle as "pastel" | "pop", resolvedMode);
-
-  const { bgClass, borderClass, textClass, categoryClass, checkmarkClass } = mapTokensToTailwindClasses(tokens, resolvedMode);
+  const appearance = resolveTaskAppearance(identity, visualStyle as "pastel" | "pop", resolvedMode);
 
   useEffect(() => {
     // Skip animation on first render
@@ -85,9 +83,10 @@ export default function Tile({ task, onClick, index }: TileProps) {
         "relative rounded-[8px] cursor-pointer transition-[transform,box-shadow,border-color,opacity] duration-150",
         priorityLevel >= 3 ? "p-3.5" : "p-3",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
-        bgClass,
-        borderClass,
-        textClass,
+        appearance.background,
+        appearance.border,
+        appearance.text,
+        appearance.completedClass,
         
         // Hover & Press (Desktop only, guarded against completed tasks)
         task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
@@ -106,7 +105,7 @@ export default function Tile({ task, onClick, index }: TileProps) {
             style={{ transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)' }}
             className={cn(
               "w-7 h-7 transition-[opacity,transform] duration-250",
-              checkmarkClass,
+              appearance.checkmark,
               isCompleting ? "opacity-0 scale-75" : "opacity-100 scale-100"
             )} 
             strokeWidth={2.5}
@@ -137,7 +136,7 @@ export default function Tile({ task, onClick, index }: TileProps) {
         <div className="flex flex-col h-full relative z-0">
         {/* Category Badge - muted */}
         {task.category && (
-          <div className={categoryClass}>
+          <div className={appearance.category}>
             {task.category}
           </div>
         )}
