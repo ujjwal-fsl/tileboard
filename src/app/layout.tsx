@@ -18,10 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-[#FAFAF8] antialiased`}>
+      <body className={`${inter.className} min-h-screen bg-background antialiased transition-colors duration-200 ease-in-out`}>
         <AuthProvider>
-  <ThemeProvider>{children}</ThemeProvider>
-</AuthProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );

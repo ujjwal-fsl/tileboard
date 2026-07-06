@@ -112,27 +112,3 @@ export function resolveTaskAppearance(
   };
 }
 
-// Backward compatibility stub (not needed in Tile.tsx but kept for safety)
-export function mapTokensToTailwindClasses(
-  tokens: any,
-  mode: "light" | "dark"
-) {
-  if (tokens && typeof tokens === "object" && "background" in tokens) {
-    return {
-      bgClass: tokens.background,
-      borderClass: tokens.border,
-      textClass: tokens.text,
-      categoryClass: tokens.category,
-      checkmarkClass: tokens.checkmark,
-      completedClass: tokens.completedClass,
-    };
-  }
-  return {
-    bgClass: "",
-    borderClass: "",
-    textClass: "",
-    categoryClass: "",
-    checkmarkClass: "",
-    completedClass: "",
-  };
-}

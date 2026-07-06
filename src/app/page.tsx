@@ -199,14 +199,14 @@ export default function Home() {
           onFinish={() => setShowGreetingOverlay(false)}
         />
       )}
-        <main className="flex flex-col min-h-screen bg-background dark:bg-background">
+        <main className="flex flex-col min-h-screen bg-background transition-colors duration-200 ease-in-out">
         <header
           className={cn(
             "sticky top-0 z-10 flex items-center justify-between px-4",
             "h-[52px] md:h-[60px]",
-            "transition-all duration-300 ease-in-out",
+            "transition-all duration-200 ease-in-out",
             isScrolled
-              ? "bg-[rgba(250,250,248,0.75)] dark:bg-background/75 backdrop-blur-[6px] border-b border-black/[0.04] dark:border-white/10"
+              ? "bg-background/75 backdrop-blur-[6px] border-b border-border"
               : "bg-transparent border-transparent"
           )}
         >
@@ -304,7 +304,7 @@ export default function Home() {
         {/* Floating Add Button */}
         {!loading && (
           <button
-            className="fixed bottom-6 right-6 w-14 h-14 rounded-[8px] bg-[#111827] text-white flex items-center justify-center z-20 transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
+            className="fixed bottom-6 right-6 w-14 h-14 rounded-[8px] bg-[#111827] dark:bg-foreground text-white dark:text-background flex items-center justify-center z-20 transition-all duration-200 hover:scale-[1.04] active:scale-[0.96]"
             onClick={() => setIsAddOpen(true)}
           >
             <Plus className="h-6 w-6" />

@@ -29,7 +29,7 @@ export default function DateNav({ selectedDate, onDateChange }: DateNavProps) {
 
       <button
         onClick={handlePrev}
-        className="p-1 rounded-md hover:bg-black/[0.04] transition-colors duration-150"
+        className="p-1 rounded-md hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-colors duration-150"
         aria-label="Previous Day"
       >
         <ChevronLeft className="h-4 w-4 text-muted-foreground" />
@@ -52,7 +52,7 @@ export default function DateNav({ selectedDate, onDateChange }: DateNavProps) {
 
       <button
         onClick={handleNext}
-        className="p-1 rounded-md hover:bg-black/[0.04] transition-colors duration-150"
+        className="p-1 rounded-md hover:bg-black/[0.04] dark:hover:bg-white/[0.05] transition-colors duration-150"
         aria-label="Next Day"
       >
         <ChevronRight className="h-4 w-4 text-muted-foreground" />

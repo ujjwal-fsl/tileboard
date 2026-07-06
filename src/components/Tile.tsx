@@ -6,15 +6,14 @@ import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
 import { completeTask } from "@/lib/tasks";
 import { setSpatialOrigin } from "@/lib/spatialContinuity";
-import { resolveTaskIdentity, resolveTaskAppearance, mapTokensToTailwindClasses } from "@/lib/appearanceResolver";
+import { resolveTaskIdentity, resolveTaskAppearance } from "@/lib/appearanceResolver";
 import { useTheme } from "@/contexts/ThemeContext";
+
 interface TileProps {
   task: Task;
   onClick: (task: Task) => void;
   index: number;
 }
-
-// Tailwind class map removed; design tokens accessed via mapTokensToTailwindClasses
 
 export default function Tile({ task, onClick, index }: TileProps) {
   const [isCompleting, setIsCompleting] = useState(false);
