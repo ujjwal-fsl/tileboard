@@ -1,11 +1,13 @@
 // src/contexts/ThemeContext.tsx
 
+"use client";
+
 import React, { createContext, useEffect, useMemo, useState } from "react";
 
 /**
  * Appearance settings – how the UI should determine light/dark mode.
  */
-export type AppearanceSetting = "system" | "light" | "dark";
+export type AppearanceSetting = "light" | "dark";
 /**
  * Visual style options – the two approved style families.
  */
@@ -30,56 +32,53 @@ const ThemeContext = createContext<ThemeContextProps | undefined>(undefined);
  * ThemeProvider – tiny context that only manages global user preferences.
  * No design tokens, colors, borders, etc. are stored here.
  * All styling is derived later in the appearance‑resolution pipeline.
+ *
+ * This provider is **SSR‑safe**: any access to `window`, `localStorage`, or
+ * `matchMedia` is guarded by `typeof window !== "undefined"`.
  */
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   // ---------- Appearance ----------
   const getInitialAppearance = (): AppearanceSetting => {
-    const stored = localStorage.getItem("appearanceSetting");
-    if (stored === "system" || stored === "light" || stored === "dark") {
+    if (typeof window === "undefined") return "light"; // default during SSR
+    const stored = window.localStorage.getItem("tileboard.appearance");
+    if (stored === "light" || stored === "dark") {
       return stored as AppearanceSetting;
     }
-    return "system"; // default
+    return "light"; // default
   };
 
   const [appearanceSetting, setAppearanceSettingState] = useState<AppearanceSetting>(
     getInitialAppearance()
   );
 
-  // Resolve concrete mode. If system, follow media query.
-  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">(() => {
-    if (appearanceSetting !== "system") return appearanceSetting;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  });
-
-  // Keep media‑query listener in sync when we are in "system" mode.
-  useEffect(() => {
-    if (appearanceSetting !== "system") return undefined;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = (e: MediaQueryListEvent) => {
-      setResolvedMode(e.matches ? "dark" : "light");
-    };
-    mq.addEventListener("change", handler);
-    // Initial sync (in case the preference changed before this effect ran)
-    setResolvedMode(mq.matches ? "dark" : "light");
-    return () => {
-      mq.removeEventListener("change", handler);
-    };
-  }, [appearanceSetting]);
+  const [resolvedMode, setResolvedMode] = useState<"light" | "dark">(
+    appearanceSetting
+  );
 
   const setAppearanceSetting = (setting: AppearanceSetting) => {
-    localStorage.setItem("appearanceSetting", setting);
-    setAppearanceSettingState(setting);
-    if (setting !== "system") {
-      setResolvedMode(setting);
-    } else {
-      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setResolvedMode(isDark ? "dark" : "light");
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("tileboard.appearance", setting);
     }
+    setAppearanceSettingState(setting);
+    setResolvedMode(setting);
   };
+
+  // Apply the resolved theme to the document root for CSS‑driven theming.
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      if (resolvedMode === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      document.documentElement.dataset.theme = resolvedMode;
+    }
+  }, [resolvedMode]);
 
   // ---------- Visual Style ----------
   const getInitialVisualStyle = (): VisualStyleOption => {
-    const stored = localStorage.getItem("visualStyle");
+    if (typeof window === "undefined") return "pastel"; // default during SSR
+    const stored = window.localStorage.getItem("tileboard.visualStyle");
     if (stored === "pastel" || stored === "pop") {
       return stored as VisualStyleOption;
     }
@@ -91,7 +90,9 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   );
 
   const setVisualStyle = (style: VisualStyleOption) => {
-    localStorage.setItem("visualStyle", style);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("tileboard.visualStyle", style);
+    }
     setVisualStyleState(style);
   };
 

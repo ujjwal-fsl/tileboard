@@ -4,13 +4,17 @@ import { useState, useEffect, useRef } from "react";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useTheme } from "@/contexts/ThemeContext";
+import type { AppearanceSetting, VisualStyleOption } from "@/contexts/ThemeContext";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator
+  DropdownMenuSeparator,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import TileGrid from "@/components/TileGrid";
 import { Task } from "@/types/task";
@@ -28,6 +32,12 @@ import { cn } from "@/lib/utils";
 
 export default function Home() {
   const { user, loading: authLoading, signOut } = useAuth();
+  const { appearanceSetting, setAppearanceSetting, resolvedMode, visualStyle, setVisualStyle } = useTheme();
+
+  useEffect(() => {
+    console.log("ThemeContext state changed:", { appearanceSetting, resolvedMode });
+  }, [appearanceSetting, resolvedMode]);
+
   const [tasks, setTasks] = useState<Task[]>([]);
   const [carryForwardTasks, setCarryForwardTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
@@ -189,14 +199,14 @@ export default function Home() {
           onFinish={() => setShowGreetingOverlay(false)}
         />
       )}
-      <main className="flex flex-col min-h-screen bg-transparent">
+        <main className="flex flex-col min-h-screen bg-background dark:bg-background">
         <header
           className={cn(
             "sticky top-0 z-10 flex items-center justify-between px-4",
             "h-[52px] md:h-[60px]",
             "transition-all duration-300 ease-in-out",
             isScrolled
-              ? "bg-[rgba(250,250,248,0.75)] backdrop-blur-[6px] border-b border-black/[0.04]"
+              ? "bg-[rgba(250,250,248,0.75)] dark:bg-background/75 backdrop-blur-[6px] border-b border-black/[0.04] dark:border-white/10"
               : "bg-transparent border-transparent"
           )}
         >
@@ -229,17 +239,33 @@ export default function Home() {
                 </button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="end" className="w-48">
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
-                  {user?.email}
-                </DropdownMenuLabel>
+              <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuLabel className="text-xs text-muted-foreground">
+                    {user?.email}
+                  </DropdownMenuLabel>
 
-                <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-                <DropdownMenuItem onClick={() => signOut()}>
-                  Sign Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+                  <DropdownMenuLabel className="mt-2 text-xs text-muted-foreground">Appearance</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup value={appearanceSetting} onValueChange={(value) => setAppearanceSetting(value as AppearanceSetting)}>
+                    <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuLabel className="mt-2 text-xs text-muted-foreground">Visual Style</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup value={visualStyle} onValueChange={(value) => setVisualStyle(value as VisualStyleOption)}>
+                    <DropdownMenuRadioItem value="pastel">Pastel</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="pop">Pop</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
             </DropdownMenu>
           </div>
         </header>
