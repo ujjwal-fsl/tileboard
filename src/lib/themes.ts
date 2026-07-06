@@ -1,6 +1,6 @@
 // src/lib/themes.ts
 
-import type { PaletteName } from "./paletteResolver";
+import type { PaletteName } from "./paletteResolver.ts";
 
 export interface VisualStyleColors {
   low: string;         // Tailwind bg class (e.g. bg-[#FAF7F0])
@@ -17,6 +17,11 @@ export interface VisualStyleDefinition {
   id: string;
   name: string;
   type: "hierarchical" | "flat";
+  // Interaction/Elevation tokens
+  hoverClass: string;
+  interactiveClass: string;
+  completedBaseClass: string;
+  shadowClass: string;
   colors: Record<"light" | "dark", Record<PaletteName, VisualStyleColors>>;
 }
 
@@ -147,9 +152,136 @@ export const pastelTheme: VisualStyleDefinition = {
   id: "pastel",
   name: "Pastel",
   type: "hierarchical",
+  hoverClass: "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
+  interactiveClass: "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]",
+  completedBaseClass: "opacity-70 scale-[0.98]",
+  shadowClass: "shadow-[0_0.5px_1.5px_rgba(0,0,0,0.02)]",
   colors: {
     light: defaultColorsLight,
-    dark: defaultColorsLight, // Currently identical pastel palette in both light/dark per specifications
+    dark: defaultColorsLight,
+  },
+};
+
+const popColorsLight: Record<PaletteName, VisualStyleColors> = {
+  Honey: {
+    low: "bg-[#FFFBEA]",
+    medium: "bg-[#FEF08A]",
+    high: "bg-[#FACC15]",
+    completed: "bg-[#FEF3C7]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Blue: {
+    low: "bg-[#EFF6FF]",
+    medium: "bg-[#DBEAFE]",
+    high: "bg-[#93C5FD]",
+    completed: "bg-[#D4E4F7]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Rose: {
+    low: "bg-[#FFF5F5]",
+    medium: "bg-[#FEE2E2]",
+    high: "bg-[#FCA5A5]",
+    completed: "bg-[#FEE2E2]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Mint: {
+    low: "bg-[#F0FDF4]",
+    medium: "bg-[#DCFCE7]",
+    high: "bg-[#86EFAC]",
+    completed: "bg-[#DCFCE7]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Terracotta: {
+    low: "bg-[#FFF7ED]",
+    medium: "bg-[#FFEDD5]",
+    high: "bg-[#FDBA74]",
+    completed: "bg-[#FFEDD5]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Lavender: {
+    low: "bg-[#FAF5FF]",
+    medium: "bg-[#F3E8FF]",
+    high: "bg-[#D8B4FE]",
+    completed: "bg-[#F3E8FF]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Sunflower: {
+    low: "bg-[#FFFBEB]",
+    medium: "bg-[#FEF3C7]",
+    high: "bg-[#FCD34D]",
+    completed: "bg-[#FEF3C7]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Teal: {
+    low: "bg-[#F0FDFA]",
+    medium: "bg-[#CCFBF1]",
+    high: "bg-[#5EEAD4]",
+    completed: "bg-[#CCFBF1]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Peach: {
+    low: "bg-[#FFF5EB]",
+    medium: "bg-[#FFE3C2]",
+    high: "bg-[#FFA84D]",
+    completed: "bg-[#FFE3C2]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Oat: {
+    low: "bg-[#FAF7F2]",
+    medium: "bg-[#F5EADF]",
+    high: "bg-[#EAD0B3]",
+    completed: "bg-[#F5EADF]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Lilac: {
+    low: "bg-[#FDF4FF]",
+    medium: "bg-[#FAE8FF]",
+    high: "bg-[#F5D0FE]",
+    completed: "bg-[#FAE8FF]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
+  },
+  Sage: {
+    low: "bg-[#F7FDF2]",
+    medium: "bg-[#E5F5DF]",
+    high: "bg-[#C7EABF]",
+    completed: "bg-[#E5F5DF]",
+    border: "border border-black/[0.08]",
+    text: "text-gray-900",
+    category: "absolute top-0 right-0 text-[10px] font-[600] uppercase tracking-[0.06em] text-gray-900/50",
+    checkmark: "text-gray-800",
   },
 };
 
@@ -157,9 +289,13 @@ export const popTheme: VisualStyleDefinition = {
   id: "pop",
   name: "Pop",
   type: "flat",
+  hoverClass: "md:hover:-translate-y-[1.5px] md:hover:border-black/[0.12] md:hover:shadow-[0_3px_8px_rgba(0,0,0,0.06),0_1px_3px_rgba(0,0,0,0.04)]",
+  interactiveClass: "md:active:scale-[0.97] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.08]",
+  completedBaseClass: "opacity-85 scale-[0.98]",
+  shadowClass: "shadow-[0_1.5px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.02)]",
   colors: {
-    light: defaultColorsLight, // Pop not implemented yet; fallback to pastel layout
-    dark: defaultColorsLight,
+    light: popColorsLight,
+    dark: popColorsLight,
   },
 };
 

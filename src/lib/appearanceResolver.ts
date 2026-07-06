@@ -23,6 +23,7 @@ export interface TaskAppearance {
   padding: string;        // Layout padding (p-3.5 vs p-3)
   hoverClass: string;     // Desktop hover styles
   interactiveClass: string; // Active scaling/press styles
+  shadowClass: string;    // Base elevation shadow
 }
 
 /**
@@ -53,15 +54,14 @@ export function resolveTaskAppearance(
   // 1. Padding decision based entirely on priority
   const padding = identity.priority === "big" ? "p-3.5" : "p-3";
 
-  // 2. Hover and active classes determined by completion status
-  const hoverClass = !identity.isCompleted
-    ? "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]"
-    : "";
-  const interactiveClass = !identity.isCompleted
-    ? "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]"
-    : "";
+  // 2. Base shadow from style definition
+  const shadowClass = styleDef.shadowClass;
 
-  // 3. Handle carried forward logic
+  // 3. Hover and active classes determined by completion status
+  const hoverClass = !identity.isCompleted ? styleDef.hoverClass : "";
+  const interactiveClass = !identity.isCompleted ? styleDef.interactiveClass : "";
+
+  // 4. Handle carried forward logic
   if (identity.isCarriedForward) {
     return {
       background: "bg-[#FFFBEB]",
@@ -73,6 +73,7 @@ export function resolveTaskAppearance(
       padding,
       hoverClass,
       interactiveClass,
+      shadowClass,
     };
   }
 
@@ -82,9 +83,9 @@ export function resolveTaskAppearance(
   let background = "";
   let completedClass = "";
 
-  // 4. Completed state styling decisions
+  // 5. Completed state styling decisions
   if (identity.isCompleted) {
-    completedClass = "opacity-70 scale-[0.98]"; // Tile base completion styles
+    completedClass = styleDef.completedBaseClass; // Tile base completion styles
     if (styleDef.type === "hierarchical" && paletteColors.completed) {
       background = paletteColors.completed;
     } else {
@@ -107,6 +108,7 @@ export function resolveTaskAppearance(
     padding,
     hoverClass,
     interactiveClass,
+    shadowClass,
   };
 }
 

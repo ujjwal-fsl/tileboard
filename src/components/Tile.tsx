@@ -86,6 +86,7 @@ export default function Tile({ task, onClick, index }: TileProps) {
         appearance.border,
         appearance.text,
         appearance.padding,
+        appearance.shadowClass,
         appearance.hoverClass,
         appearance.interactiveClass,
         appearance.completedClass,
