@@ -8,6 +8,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "TileBoard",
   description: "A 2D geometric daily planner",
+  icons: {
+    apple: "/tileboard-logo-512.png",
+  },
 };
 
 export default function RootLayout({
