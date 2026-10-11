@@ -1,11 +1,14 @@
 "use client";
 
 import { Check } from "lucide-react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { Task } from "@/types/task";
 import { cn, getPriorityLevel } from "@/lib/utils";
 import { completeTask } from "@/lib/tasks";
 import { setSpatialOrigin } from "@/lib/spatialContinuity";
+import { resolveTaskIdentity } from "@/lib/paletteResolver";
+import { resolveTaskAppearance } from "@/lib/appearanceResolver";
+import ThemeContext from "@/contexts/ThemeContext";
 
 interface TileProps {
   task: Task;
@@ -15,6 +18,7 @@ interface TileProps {
 
 export default function Tile({ task, onClick, index }: TileProps) {
   const [isCompleting, setIsCompleting] = useState(false);
+  const themeContext = useContext(ThemeContext);
   
   // Safety refs
   const prevStatusRef = useRef(task.status);
@@ -27,7 +31,12 @@ export default function Tile({ task, onClick, index }: TileProps) {
   // Row span based on priority: 1, 2, or 3
   const rowSpan = `span ${priorityLevel}`;
   
-  const textColor = task.status === "completed" ? "text-gray-500" : "text-gray-900";
+  // Resolve permanent color identity and appearance
+  const identity = resolveTaskIdentity(task);
+  const appearance = resolveTaskAppearance(identity, {
+    theme: themeContext?.activeVisualStyle?.id,
+    appearance: themeContext?.resolvedMode,
+  });
 
   useEffect(() => {
     // Skip animation on first render
@@ -74,33 +83,24 @@ export default function Tile({ task, onClick, index }: TileProps) {
       }}
       style={{ 
         gridRow: rowSpan,
+        backgroundColor: appearance.backgroundColor,
+        borderColor: appearance.borderColor,
+        color: appearance.textColor,
         transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
         animation: `tile-enter 250ms cubic-bezier(0.2, 0, 0, 1) ${Math.min(index * 30, 300)}ms both`
       }}
       className={cn(
-        "relative rounded-[8px] cursor-pointer transition-[transform,box-shadow,border-color,opacity] duration-150",
+        "relative rounded-[8px] cursor-pointer transition-[transform,box-shadow,border-color,opacity,background-color] duration-150 border",
         priorityLevel >= 3 ? "p-3.5" : "p-3",
         "min-h-[64px] md:min-h-[72px] flex flex-col justify-between",
-
-        // Priority tint resolution: CF > completed > big > medium > small
-        task.isCarriedForward
-          ? "bg-[#FFFBEB] border border-amber-600/[0.12]"
-          : task.status === "completed"
-            ? "bg-[#F3F4F6] border border-black/[0.03]"
-            : priorityLevel === 3
-              ? "bg-[#FDE8E8] border border-black/[0.04]"
-              : priorityLevel === 2
-                ? "bg-[#FEF3E2] border border-black/[0.04]"
-                : "bg-[#F8FAF9] border border-black/[0.04]",
         
         // Hover & Press (Desktop only, guarded against completed tasks)
-        task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:border-black/[0.08] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
-        task.status !== "completed" && "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none md:active:border-black/[0.06]",
+        task.status !== "completed" && "md:hover:-translate-y-[1px] md:hover:shadow-[0_1px_3px_rgba(0,0,0,0.04),0_0.5px_1px_rgba(0,0,0,0.03)]",
+        task.status !== "completed" && "md:active:scale-[0.98] md:active:translate-y-0 md:active:shadow-none",
         
         // Completed state styling
-        task.status === "completed" && "opacity-70 scale-[0.98]",
-        isCompleting && "scale-[0.985]",
-        textColor
+        task.status === "completed" && "opacity-75 scale-[0.985]",
+        isCompleting && "scale-[0.985]"
       )}
     >
 

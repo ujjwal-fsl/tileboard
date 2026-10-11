@@ -15,7 +15,7 @@ import { auth } from "@/lib/firebase";
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
+  signInWithGoogle: () => Promise<User>;
   signInWithEmail: (email: string, pass: string) => Promise<void>;
   signUpWithEmail: (email: string, pass: string) => Promise<void>;
   signOut: () => Promise<void>;
@@ -37,7 +37,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    await signInWithPopup(auth, provider);
+    provider.setCustomParameters({ prompt: "select_account" });
+    console.log("[AuthContext] Calling signInWithPopup(auth, provider)...");
+    try {
+      const result = await signInWithPopup(auth, provider);
+      console.log("[AuthContext] signInWithPopup resolved successfully for user:", result.user.uid);
+      setUser(result.user);
+      return result.user;
+    } catch (error: any) {
+      console.error("[AuthContext] signInWithPopup rejected:", {
+        code: error?.code,
+        message: error?.message,
+      });
+      throw error;
+    }
   };
 
   const signInWithEmail = async (email: string, pass: string) => {

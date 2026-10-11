@@ -94,7 +94,8 @@ export function subscribeToTasks(
 export function subscribeToCarryForwardTasks(
   userId: string,
   todayDate: string,
-  callback: (tasks: Task[]) => void
+  callback: (tasks: Task[]) => void,
+  onError?: (error: Error) => void
 ) {
   // Query: userId == current, status == active, date < today
   // Requires index: userId ASC, status ASC, date ASC
@@ -106,13 +107,25 @@ export function subscribeToCarryForwardTasks(
     orderBy("date", "asc")
   );
 
-  return onSnapshot(q, (snapshot) => {
-    const tasks = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-      isCarriedForward: true,
-    })) as Task[];
-    
-    callback(tasks);
-  });
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const tasks = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+        isCarriedForward: true,
+      })) as Task[];
+      
+      callback(tasks);
+    },
+    (error) => {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("Carry-forward subscription notice:", error.message);
+      }
+      if (onError) {
+        onError(error);
+      }
+    }
+  );
 }
+

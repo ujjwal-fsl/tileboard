@@ -63,9 +63,17 @@ export default function Home() {
     if (authLoading || !user) return;
 
     if (selectedDate === getTodayDateString()) {
-      const unsubscribe = subscribeToCarryForwardTasks(user.uid, selectedDate, (carriedTasks) => {
-        setCarryForwardTasks(carriedTasks);
-      });
+      const unsubscribe = subscribeToCarryForwardTasks(
+        user.uid, 
+        selectedDate, 
+        (carriedTasks) => {
+          setCarryForwardTasks(carriedTasks);
+        },
+        (err) => {
+          console.warn("Could not load carry-forward tasks:", err.message);
+          setCarryForwardTasks([]);
+        }
+      );
       return () => unsubscribe();
     } else {
       setCarryForwardTasks([]);

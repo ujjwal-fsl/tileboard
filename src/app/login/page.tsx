@@ -26,9 +26,41 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     try {
       setError("");
-      await signInWithGoogle();
+      setLoading(true);
+      console.log("[Auth Diagnosis] Initiating Google sign-in via signInWithGoogle()...");
+      const signedInUser = await signInWithGoogle();
+      console.log("[Auth Diagnosis] Google sign-in succeeded:", {
+        uid: signedInUser.uid,
+        emailAvailable: !!signedInUser.email,
+        isAnonymous: signedInUser.isAnonymous,
+      });
+      if (signedInUser) {
+        router.push("/");
+      }
     } catch (err: any) {
-      setError("Failed to sign in with Google. " + err.message);
+      const safeCustomData = err?.customData ? {
+        appName: err.customData.appName,
+      } : undefined;
+
+      console.error("[Auth Diagnosis] Google sign-in failed:", {
+        code: err?.code,
+        message: err?.message,
+        name: err?.name,
+        customData: safeCustomData,
+      });
+
+      const errorCode = err?.code ? ` (${err.code})` : "";
+      if (err?.code === "auth/popup-closed-by-user") {
+        setError(`Sign-in was cancelled or the popup closed before completing${errorCode}.`);
+      } else if (err?.code === "auth/popup-blocked") {
+        setError(`Sign-in popup was blocked by your browser. Please allow popups for localhost${errorCode}.`);
+      } else if (err?.code === "auth/unauthorized-domain") {
+        setError(`Domain not authorized in Firebase Authentication${errorCode}. Please add localhost to Authorized Domains.`);
+      } else {
+        setError(`Failed to sign in with Google${errorCode}: ${err?.message || "Unknown error"}`);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -59,13 +91,20 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <div className="p-3 text-sm rounded-md bg-red-50 border border-red-200 text-red-600 text-center font-medium">
+              {error}
+            </div>
+          )}
+
           <Button 
             variant="outline" 
             className="w-full" 
             onClick={handleGoogleLogin}
+            disabled={loading}
           >
             <GoogleIcon className="h-5 w-5 mr-2" />
-            Continue with Google
+            {loading ? "Signing in..." : "Continue with Google"}
           </Button>
 
           <div className="relative">
@@ -78,7 +117,6 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            {error && <p className="text-sm text-red-500 text-center">{error}</p>}
             <div className="space-y-2">
               <Input
                 type="email"

@@ -2,7 +2,9 @@ import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { 
   getFirestore, 
-  enableIndexedDbPersistence 
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager 
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -21,9 +23,20 @@ const app =
 
 export const auth = getAuth(app);
 
-export const db = getFirestore(app);
+function getOrInitializeFirestore() {
+  try {
+    return initializeFirestore(app, {
+      localCache: persistentLocalCache({
+        tabManager: persistentMultipleTabManager(),
+      }),
+    });
+  } catch (err: any) {
+    if (err?.code === "failed-precondition") {
+      return getFirestore(app);
+    }
+    throw err;
+  }
+}
 
-// Enable offline persistence (bulletproof realtime stability)
-enableIndexedDbPersistence(db).catch(() => {
-  console.log("Persistence already enabled or not supported");
-});
+export const db = getOrInitializeFirestore();
+
